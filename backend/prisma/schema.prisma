@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  email     String   @unique
+  password  String
+  activo    Boolean  @default(true)
+  establoId Int?
+  establo   Establo? @relation(fields: [establoId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Establo {
+  id       Int       @id @default(autoincrement())
+  nombre   String
+  clave    String    @unique
+  activo   Boolean   @default(true)
+  usuarios Usuario[]
+}
+
+model Empleado {
+  id              Int           @id @default(autoincrement())
+  noEmpleado      Int           @unique
+  nombre          String
+  apellidoPaterno String
+  apellidoMaterno String?
+  rfc             String?
+  curp            String?
+  nss             String?
+  activo          Boolean       @default(true)
+  puestoId        Int?
+  departamentoId  Int?
+  establoId       Int?
+  salarioDiario   Decimal?      @db.Decimal(10, 2)
+  fechaIngreso    DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  puesto          Puesto?       @relation(fields: [puestoId], references: [id])
+  departamento    Departamento? @relation(fields: [departamentoId], references: [id])
+  nominaDetalles  NominaDetalle[]
+}
+
+model Puesto {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  activo    Boolean    @default(true)
+  empleados Empleado[]
+}
+
+model Departamento {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  activo    Boolean    @default(true)
+  empleados Empleado[]
+}
+
+model NominaGrupo {
+  id            Int             @id @default(autoincrement())
+  folio         String?
+  periodo       String?
+  fechaInicio   DateTime?
+  fechaFin      DateTime?
+  fechaPago     DateTime?
+  status        Int             @default(1)
+  activo        Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  detalles      NominaDetalle[]
+}
+
+model NominaDetalle {
+  id                Int         @id @default(autoincrement())
+  nominaGrupoId     Int
+  empleadoId        Int
+  totalPercepciones Decimal?    @db.Decimal(10, 2)
+  totalRetenciones  Decimal?    @db.Decimal(10, 2)
+  pago              Decimal?    @db.Decimal(10, 2)
+  createdAt         DateTime    @default(now())
+  nominaGrupo       NominaGrupo @relation(fields: [nominaGrupoId], references: [id])
+  empleado          Empleado    @relation(fields: [empleadoId], references: [id])
+}
+
+model Requisicion {
+  id          Int                  @id @default(autoincrement())
+  folio       String?
+  concepto    String?
+  statusId    Int                  @default(1)
+  activo      Boolean              @default(true)
+  cotizada    Boolean              @default(false)
+  aut1Status  Boolean?
+  aut2Status  Boolean?
+  aut3Status  Boolean?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  detalles    RequisicionDetalle[]
+}
+
+model RequisicionDetalle {
+  id             Int         @id @default(autoincrement())
+  requisicionId  Int
+  nombreArticulo String?
+  cantidad       Decimal?    @db.Decimal(10, 2)
+  precio         Decimal?    @db.Decimal(10, 2)
+  requisicion    Requisicion @relation(fields: [requisicionId], references: [id])
+}
+
+model Proveedor {
+  id     Int     @id @default(autoincrement())
+  nombre String
+  rfc    String?
+  activo Boolean @default(true)
+}
+
+model Marca {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  activo    Boolean    @default(true)
+  articulos Articulo[]
+}
+
+model UnidadMedida {
+  id     Int    @id @default(autoincrement())
+  nombre String
+  clave  String
+}
+
+model Articulo {
+  id          Int                    @id @default(autoincrement())
+  nombre      String
+  codigo      String?
+  marcaId     Int?
+  activo      Boolean                @default(true)
+  stockActual Decimal?               @db.Decimal(10, 2)
+  stockMinimo Decimal?               @db.Decimal(10, 2)
+  marca       Marca?                 @relation(fields: [marcaId], references: [id])
+  movimientos InventarioMovimiento[]
+}
+
+model InventarioMovimiento {
+  id         Int      @id @default(autoincrement())
+  articuloId Int
+  tipo       String
+  cantidad   Decimal  @db.Decimal(10, 2)
+  precio     Decimal? @db.Decimal(10, 2)
+  concepto   String?
+  fecha      DateTime @default(now())
+  articulo   Articulo @relation(fields: [articuloId], references: [id])
+}
+
+model Dieta {
+  id          Int            @id @default(autoincrement())
+  nombre      String
+  fechaInicio DateTime?
+  fechaFin    DateTime?
+  activo      Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  detalles    DietaDetalle[]
+}
+
+model DietaDetalle {
+  id           Int      @id @default(autoincrement())
+  dietaId      Int
+  ingrediente  String?
+  kilosBH      Decimal? @db.Decimal(10, 4)
+  porcentajeMS Decimal? @db.Decimal(10, 4)
+  kilosMS      Decimal? @db.Decimal(10, 4)
+  precio       Decimal? @db.Decimal(10, 4)
+  costoBH      Decimal? @db.Decimal(10, 4)
+  dieta        Dieta    @relation(fields: [dietaId], references: [id])
+}
+
+model FacturaForraje {
+  id               Int                     @id @default(autoincrement())
+  folioFactura     String?
+  proveedorNombre  String?
+  toneladasTotales Decimal?                @db.Decimal(10, 2)
+  importe          Decimal?                @db.Decimal(10, 2)
+  tipoCambio       Decimal?                @db.Decimal(10, 4)
+  fecha            DateTime                @default(now())
+  activo           Boolean                 @default(true)
+  detalles         FacturaForrajeDetalle[]
+}
+
+model FacturaForrajeDetalle {
+  id             Int            @id @default(autoincrement())
+  facturaId      Int
+  concepto       String?
+  toneladasFicha Decimal?       @db.Decimal(10, 2)
+  precioFicha    Decimal?       @db.Decimal(10, 4)
+  factura        FacturaForraje @relation(fields: [facturaId], references: [id])
+}
+
+model Lote {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  activo   Boolean  @default(true)
+  animales Animal[]
+}
+
+model Animal {
+  id              Int       @id @default(autoincrement())
+  arete           String    @unique
+  nombre          String?
+  sexo            String?
+  fechaNacimiento DateTime?
+  loteId          Int?
+  activo          Boolean   @default(true)
+  lote            Lote?     @relation(fields: [loteId], references: [id])
+  partos          Parto[]
+}
+
+model Parto {
+  id          Int       @id @default(autoincrement())
+  animalId    Int
+  fechaParto  DateTime?
+  tipoParto   String?
+  observacion String?
+  createdAt   DateTime  @default(now())
+  animal      Animal    @relation(fields: [animalId], references: [id])
+}
+
+model FichaBascula {
+  id            Int      @id @default(autoincrement())
+  folio         String?
+  fecha         DateTime @default(now())
+  transportista String?
+  placas        String?
+  producto      String?
+  pesoEntrada   Decimal? @db.Decimal(10, 2)
+  pesoSalida    Decimal? @db.Decimal(10, 2)
+  pesoNeto      Decimal? @db.Decimal(10, 2)
+  status        Int      @default(1)
+  activo        Boolean  @default(true)
+}
+
+model EnvioLeche {
+  id      Int      @id @default(autoincrement())
+  fecha   DateTime @default(now())
+  cliente String?
+  litros  Decimal? @db.Decimal(10, 2)
+  precio  Decimal? @db.Decimal(10, 4)
+  importe Decimal? @db.Decimal(10, 2)
+  status  Int      @default(1)
+  activo  Boolean  @default(true)
+}
+
+model SolicitudPago {
+  id              Int                    @id @default(autoincrement())
+  folio           String?
+  concepto        String?
+  importe         Decimal?               @db.Decimal(10, 2)
+  statusId        Int                    @default(1)
+  fechaDoc        DateTime?
+  proveedorNombre String?
+  activo          Boolean                @default(true)
+  createdAt       DateTime               @default(now())
+  detalles        SolicitudPagoDetalle[]
+}
+
+model SolicitudPagoDetalle {
+  id             Int           @id @default(autoincrement())
+  solicitudId    Int
+  concepto       String?
+  importe        Decimal?      @db.Decimal(10, 2)
+  cuentaContable String?
+  solicitud      SolicitudPago @relation(fields: [solicitudId], references: [id])
+}
