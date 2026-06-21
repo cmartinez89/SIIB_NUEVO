@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface EnvioLecheFormData {
@@ -33,7 +32,7 @@ export default function EnvioLecheForm() {
   })
 
   return (
-    <Layout>
+    <>
       <div className="p-6 max-w-xl mx-auto">
         <div className="mb-6">
           <button onClick={() => navigate('/leche')} className="text-sm text-blue-600 hover:underline">← Volver</button>
@@ -106,6 +105,6 @@ export default function EnvioLecheForm() {
           </form>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

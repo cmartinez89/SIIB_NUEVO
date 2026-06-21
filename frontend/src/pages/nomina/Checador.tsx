@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import Layout from '../../components/layout/Layout'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
@@ -163,7 +162,7 @@ export default function Checador() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -388,6 +387,6 @@ export default function Checador() {
           </div>
         </Card>
       </div>
-    </Layout>
+    </>
   )
 }

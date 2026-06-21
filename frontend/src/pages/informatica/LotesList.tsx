@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
-import Layout from '../../components/layout/Layout'
 
 interface Lote {
   id: number
@@ -86,7 +85,7 @@ export default function LotesList() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Page header */}
         <div className="flex items-center justify-between">
@@ -274,6 +273,6 @@ export default function LotesList() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   )
 }

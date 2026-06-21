@@ -1,7 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma } from '../lib/prisma'
 
 const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
   // ─── EMPLEADOS ───────────────────────────────────────────────────────────────
 
   // GET /empleados — lista con filtros y paginación
@@ -38,14 +39,14 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
       if (search) {
         where.OR = [
           { nombre: { contains: search, mode: 'insensitive' } },
-          { apellidos: { contains: search, mode: 'insensitive' } },
-          { noEmpleado: { contains: search, mode: 'insensitive' } },
+          { apellidoPaterno: { contains: search, mode: 'insensitive' } },
+          { apellidoMaterno: { contains: search, mode: 'insensitive' } },
           { rfc: { contains: search, mode: 'insensitive' } },
         ]
       }
 
       const [data, total] = await Promise.all([
-        prisma.empleado.findMany({
+        fastify.prisma.empleado.findMany({
           where,
           include: {
             puesto: true,
@@ -55,7 +56,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
           take: limitNum,
           orderBy: { createdAt: 'desc' },
         }),
-        prisma.empleado.count({ where }),
+        fastify.prisma.empleado.count({ where }),
       ])
 
       return reply.send({ success: true, data, total })
@@ -69,14 +70,15 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
   fastify.post('/empleados', async (request, reply) => {
     try {
       const body = request.body as {
-        noEmpleado: string
+        noEmpleado: number
         nombre: string
-        apellidos: string
-        rfc: string
-        curp: string
-        nss: string
-        salarioDiario: number
-        fechaIngreso: string
+        apellidoPaterno: string
+        apellidoMaterno?: string
+        rfc?: string
+        curp?: string
+        nss?: string
+        salarioDiario?: number
+        fechaIngreso?: string
         puestoId?: number
         departamentoId?: number
         establoId?: number
@@ -85,7 +87,8 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
       const {
         noEmpleado,
         nombre,
-        apellidos,
+        apellidoPaterno,
+        apellidoMaterno,
         rfc,
         curp,
         nss,
@@ -96,28 +99,19 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         establoId,
       } = body
 
-      if (
-        !noEmpleado ||
-        !nombre ||
-        !apellidos ||
-        !rfc ||
-        !curp ||
-        !nss ||
-        salarioDiario === undefined ||
-        !fechaIngreso
-      ) {
+      if (!noEmpleado || !nombre || !apellidoPaterno) {
         return reply.status(400).send({
           success: false,
-          error:
-            'Campos requeridos: noEmpleado, nombre, apellidos, rfc, curp, nss, salarioDiario, fechaIngreso',
+          error: 'Campos requeridos: noEmpleado, nombre, apellidoPaterno',
         })
       }
 
-      const result = await prisma.empleado.create({
+      const result = await fastify.prisma.empleado.create({
         data: {
-          noEmpleado,
+          noEmpleado: Number(noEmpleado),
           nombre,
-          apellidos,
+          apellidoPaterno,
+          ...(apellidoMaterno !== undefined && { apellidoMaterno }),
           rfc,
           curp,
           nss,
@@ -146,7 +140,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const result = await prisma.empleado.findUnique({
+      const result = await fastify.prisma.empleado.findUnique({
         where: { id: parseInt(id, 10) },
         include: {
           puesto: true,
@@ -176,9 +170,10 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
       const body = request.body as {
-        noEmpleado?: string
+        noEmpleado?: number
         nombre?: string
-        apellidos?: string
+        apellidoPaterno?: string
+        apellidoMaterno?: string
         rfc?: string
         curp?: string
         nss?: string
@@ -190,7 +185,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         activo?: boolean
       }
 
-      const existing = await prisma.empleado.findUnique({
+      const existing = await fastify.prisma.empleado.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -201,7 +196,8 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
       const {
         noEmpleado,
         nombre,
-        apellidos,
+        apellidoPaterno,
+        apellidoMaterno,
         rfc,
         curp,
         nss,
@@ -213,12 +209,13 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         activo,
       } = body
 
-      const result = await prisma.empleado.update({
+      const result = await fastify.prisma.empleado.update({
         where: { id: parseInt(id, 10) },
         data: {
-          ...(noEmpleado !== undefined && { noEmpleado }),
+          ...(noEmpleado !== undefined && { noEmpleado: Number(noEmpleado) }),
           ...(nombre !== undefined && { nombre }),
-          ...(apellidos !== undefined && { apellidos }),
+          ...(apellidoPaterno !== undefined && { apellidoPaterno }),
+          ...(apellidoMaterno !== undefined && { apellidoMaterno }),
           ...(rfc !== undefined && { rfc }),
           ...(curp !== undefined && { curp }),
           ...(nss !== undefined && { nss }),
@@ -247,7 +244,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.empleado.findUnique({
+      const existing = await fastify.prisma.empleado.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -255,7 +252,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Empleado no encontrado' })
       }
 
-      const result = await prisma.empleado.update({
+      const result = await fastify.prisma.empleado.update({
         where: { id: parseInt(id, 10) },
         data: { activo: false },
       })
@@ -272,7 +269,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /puestos — lista activos
   fastify.get('/puestos', async (request, reply) => {
     try {
-      const data = await prisma.puesto.findMany({
+      const data = await fastify.prisma.puesto.findMany({
         where: { activo: true },
         orderBy: { nombre: 'asc' },
       })
@@ -287,12 +284,9 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /puestos — crear puesto
   fastify.post('/puestos', async (request, reply) => {
     try {
-      const body = request.body as {
-        nombre: string
-        descripcion?: string
-      }
+      const body = request.body as { nombre: string }
 
-      const { nombre, descripcion } = body
+      const { nombre } = body
 
       if (!nombre) {
         return reply.status(400).send({
@@ -301,10 +295,9 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.puesto.create({
+      const result = await fastify.prisma.puesto.create({
         data: {
           nombre,
-          ...(descripcion !== undefined && { descripcion }),
           activo: true,
         },
       })
@@ -321,7 +314,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /departamentos — lista activos
   fastify.get('/departamentos', async (request, reply) => {
     try {
-      const data = await prisma.departamento.findMany({
+      const data = await fastify.prisma.departamento.findMany({
         where: { activo: true },
         orderBy: { nombre: 'asc' },
       })
@@ -336,12 +329,9 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
   // POST /departamentos — crear departamento
   fastify.post('/departamentos', async (request, reply) => {
     try {
-      const body = request.body as {
-        nombre: string
-        descripcion?: string
-      }
+      const body = request.body as { nombre: string }
 
-      const { nombre, descripcion } = body
+      const { nombre } = body
 
       if (!nombre) {
         return reply.status(400).send({
@@ -350,10 +340,9 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.departamento.create({
+      const result = await fastify.prisma.departamento.create({
         data: {
           nombre,
-          ...(descripcion !== undefined && { descripcion }),
           activo: true,
         },
       })

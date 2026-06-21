@@ -4,12 +4,12 @@ import { api } from '@/lib/api'
 import { formatDate } from '@/lib/utils'
 
 interface Stats {
-  totalEmpleados: number
-  requisicionesActivas: number
-  animalesRegistrados: number
+  empleados: number
+  requisiciones: number
+  animales: number
   enviosLeche: number
-  articulosInventario: number
-  gruposNomina: number
+  articulos: number
+  nominaGrupos: number
 }
 
 // ─── KPI Card ─────────────────────────────────────────────────────────────────
@@ -66,12 +66,12 @@ export default function Dashboard() {
   })
 
   const kpis: { icon: string; title: string; key: keyof Stats; accent: string }[] = [
-    { icon: '👥', title: 'Total Empleados',         key: 'totalEmpleados',        accent: 'bg-blue-50' },
-    { icon: '🛒', title: 'Requisiciones Activas',   key: 'requisicionesActivas',  accent: 'bg-amber-50' },
-    { icon: '🐄', title: 'Animales Registrados',    key: 'animalesRegistrados',   accent: 'bg-green-50' },
-    { icon: '🥛', title: 'Envíos de Leche',         key: 'enviosLeche',           accent: 'bg-purple-50' },
-    { icon: '📦', title: 'Artículos en Inventario', key: 'articulosInventario',   accent: 'bg-orange-50' },
-    { icon: '💰', title: 'Grupos de Nómina',        key: 'gruposNomina',          accent: 'bg-indigo-50' },
+    { icon: '👥', title: 'Total Empleados',         key: 'empleados',     accent: 'bg-blue-50' },
+    { icon: '🛒', title: 'Requisiciones Activas',   key: 'requisiciones', accent: 'bg-amber-50' },
+    { icon: '🐄', title: 'Animales Registrados',    key: 'animales',      accent: 'bg-green-50' },
+    { icon: '🥛', title: 'Envíos de Leche',         key: 'enviosLeche',   accent: 'bg-purple-50' },
+    { icon: '📦', title: 'Artículos en Inventario', key: 'articulos',     accent: 'bg-orange-50' },
+    { icon: '💰', title: 'Grupos de Nómina',        key: 'nominaGrupos',  accent: 'bg-indigo-50' },
   ]
 
   return (

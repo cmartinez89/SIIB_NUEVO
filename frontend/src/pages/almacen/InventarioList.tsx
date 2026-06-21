@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -172,7 +171,7 @@ export default function InventarioList() {
 
   // ── Render ──
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50 px-4 py-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
@@ -496,6 +495,6 @@ export default function InventarioList() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   )
 }

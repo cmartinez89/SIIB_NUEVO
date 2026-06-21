@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { api } from '../../lib/api'
-import Layout from '../../components/layout/Layout'
 
 interface Parto {
   id: number
@@ -115,29 +114,29 @@ export default function AnimalDetalle() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center items-center py-24">
           <div className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-8 h-8" />
         </div>
-      </Layout>
+      </>
     )
   }
 
   if (error || !animal) {
     return (
-      <Layout>
+      <>
         <div className="text-center py-16 text-red-600">
           <p className="font-medium text-lg">Error al cargar el animal</p>
           <Link to="/informatica/animales" className="text-green-600 text-sm mt-2 inline-block hover:underline">
             ← Volver a la lista
           </Link>
         </div>
-      </Layout>
+      </>
     )
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Back link */}
         <Link
@@ -380,6 +379,6 @@ export default function AnimalDetalle() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   )
 }

@@ -1,8 +1,10 @@
 import { FastifyInstance } from 'fastify'
 
 export default async function almacenRoutes(fastify: FastifyInstance) {
-  // GET /api/almacen/articulos
-  fastify.get('/api/almacen/articulos', async (request, reply) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
+  // GET /articulos
+  fastify.get('/articulos', async (request, reply) => {
     try {
       const { search, marcaId, page = '1', limit = '20' } = request.query as {
         search?: string
@@ -47,7 +49,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/almacen/articulos
-  fastify.post('/api/almacen/articulos', async (request, reply) => {
+  fastify.post('/articulos', async (request, reply) => {
     try {
       const body = request.body as {
         nombre: string
@@ -81,7 +83,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/almacen/articulos/:id
-  fastify.get('/api/almacen/articulos/:id', async (request, reply) => {
+  fastify.get('/articulos/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -108,7 +110,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // PUT /api/almacen/articulos/:id
-  fastify.put('/api/almacen/articulos/:id', async (request, reply) => {
+  fastify.put('/articulos/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
       const body = request.body as {
@@ -145,7 +147,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // DELETE /api/almacen/articulos/:id — soft delete
-  fastify.delete('/api/almacen/articulos/:id', async (request, reply) => {
+  fastify.delete('/articulos/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -170,7 +172,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/almacen/movimientos
-  fastify.get('/api/almacen/movimientos', async (request, reply) => {
+  fastify.get('/movimientos', async (request, reply) => {
     try {
       const { desde, hasta, tipo, articuloId, page = '1', limit = '20' } = request.query as {
         desde?: string
@@ -225,7 +227,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/almacen/movimientos
-  fastify.post('/api/almacen/movimientos', async (request, reply) => {
+  fastify.post('/movimientos', async (request, reply) => {
     try {
       const body = request.body as {
         articuloId: number
@@ -295,7 +297,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/almacen/stock-bajo
-  fastify.get('/api/almacen/stock-bajo', async (_request, reply) => {
+  fastify.get('/stock-bajo', async (_request, reply) => {
     try {
       // Prisma does not support column-to-column comparisons in `where`, so we
       // fetch all active articles and filter in JS.
@@ -316,7 +318,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/almacen/resumen
-  fastify.get('/api/almacen/resumen', async (_request, reply) => {
+  fastify.get('/resumen', async (_request, reply) => {
     try {
       const hoy = new Date()
       const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0, 0)

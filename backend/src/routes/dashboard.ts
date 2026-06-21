@@ -1,4 +1,5 @@
 import { FastifyPluginAsync } from 'fastify'
+import { prisma } from '../lib/prisma'
 
 const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /kpis — todos los KPIs del sistema
@@ -35,43 +36,43 @@ const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
         importePendienteResult,
       ] = await Promise.all([
         // Nómina
-        fastify.prisma.empleado.count({ where: { activo: true } }),
-        fastify.prisma.nominaGrupo.count({
+        prisma.empleado.count({ where: { activo: true } }),
+        prisma.nominaGrupo.count({
           where: { activo: true, createdAt: { gte: startOfMonth } },
         }),
-        fastify.prisma.nominaDetalle.aggregate({
+        prisma.nominaDetalle.aggregate({
           where: { nominaGrupo: { activo: true } },
           _sum: { pago: true },
         }),
 
         // Báscula
-        fastify.prisma.fichaBascula.count({
+        prisma.fichaBascula.count({
           where: { activo: true, fecha: { gte: today, lt: tomorrow } },
         }),
-        fastify.prisma.fichaBascula.aggregate({
+        prisma.fichaBascula.aggregate({
           where: { activo: true, fecha: { gte: startOfWeek } },
           _sum: { pesoNeto: true },
         }),
 
         // Leche
-        fastify.prisma.envioLeche.aggregate({
+        prisma.envioLeche.aggregate({
           where: { activo: true, fecha: { gte: today, lt: tomorrow } },
           _sum: { litros: true },
         }),
-        fastify.prisma.envioLeche.aggregate({
+        prisma.envioLeche.aggregate({
           where: { activo: true, fecha: { gte: startOfMonth } },
           _sum: { litros: true },
         }),
-        fastify.prisma.envioLeche.aggregate({
+        prisma.envioLeche.aggregate({
           where: { activo: true, fecha: { gte: startOfMonth } },
           _sum: { importe: true },
         }),
 
         // Contabilidad
-        fastify.prisma.solicitudPago.count({
+        prisma.solicitudPago.count({
           where: { activo: true, statusId: 1 },
         }),
-        fastify.prisma.solicitudPago.aggregate({
+        prisma.solicitudPago.aggregate({
           where: { activo: true, statusId: 1 },
           _sum: { importe: true },
         }),
@@ -83,20 +84,20 @@ const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
       let articulosStockBajo = 0
 
       try {
-        requisicionesPendientes = await fastify.prisma.requisicion.count({
+        requisicionesPendientes = await prisma.requisicion.count({
           where: { activo: true },
         })
       } catch { /* table may not exist */ }
 
       try {
-        ordenesAbiertas = await fastify.prisma.ordenCompra?.count?.({
+        ordenesAbiertas = await prisma.ordenCompra?.count?.({
           where: { activo: true },
         }) ?? 0
       } catch { /* table may not exist */ }
 
       try {
         // Articles with stock below minimum
-        const articulos = await fastify.prisma.articulo.findMany({
+        const articulos = await prisma.articulo.findMany({
           where: { activo: true },
           select: { id: true },
         })
@@ -135,6 +136,33 @@ const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
             importePendiente: Number(importePendienteResult._sum.importe ?? 0),
           },
         },
+      })
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido'
+      return reply.status(500).send({ success: false, error: message })
+    }
+  })
+
+  // GET /stats — flat KPIs for the Dashboard page
+  fastify.get('/stats', async (_request, reply) => {
+    try {
+      const [totalEmpleados, requisicionesActivas, animalesRegistrados, enviosLeche, articulosInventario, gruposNomina] =
+        await Promise.all([
+          prisma.empleado.count({ where: { activo: true } }),
+          prisma.requisicion.count({ where: { activo: true } }),
+          prisma.animal.count({ where: { activo: true } }),
+          prisma.envioLeche.count({ where: { activo: true } }),
+          prisma.articulo.count({ where: { activo: true } }),
+          prisma.nominaGrupo.count({ where: { activo: true } }),
+        ])
+
+      return reply.send({
+        totalEmpleados,
+        requisicionesActivas,
+        animalesRegistrados,
+        enviosLeche,
+        articulosInventario,
+        gruposNomina,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error desconocido'

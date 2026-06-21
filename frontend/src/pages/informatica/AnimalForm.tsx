@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../lib/api'
-import Layout from '../../components/layout/Layout'
 
 interface Lote {
   id: number
@@ -144,16 +143,16 @@ export default function AnimalForm() {
 
   if (isEdit && loadingAnimal) {
     return (
-      <Layout>
+      <>
         <div className="flex justify-center items-center py-24">
           <div className="animate-spin border-4 border-green-600 border-t-transparent rounded-full w-8 h-8" />
         </div>
-      </Layout>
+      </>
     )
   }
 
   return (
-    <Layout>
+    <>
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-stone-800">
@@ -281,6 +280,6 @@ export default function AnimalForm() {
           </div>
         </form>
       </div>
-    </Layout>
+    </>
   )
 }

@@ -1,7 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma } from '../lib/prisma'
 
 const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
   // ─── RESUMEN ─────────────────────────────────────────────────────────────────
 
   // GET /resumen — MUST be before /:id to avoid route conflict
@@ -12,10 +13,10 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
 
       const [totalDietas, gastoBimestralResult, toneladasMesResult] = await Promise.all([
-        prisma.dieta.count({
+        fastify.prisma.dieta.count({
           where: { activo: true },
         }),
-        prisma.dietaDetalle.aggregate({
+        fastify.prisma.dietaDetalle.aggregate({
           where: {
             dieta: { activo: true },
           },
@@ -23,7 +24,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
             costoBH: true,
           },
         }),
-        prisma.facturaForraje.aggregate({
+        fastify.prisma.facturaForraje.aggregate({
           where: {
             activo: true,
             fecha: {
@@ -95,7 +96,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       const [data, total] = await Promise.all([
-        prisma.facturaForraje.findMany({
+        fastify.prisma.facturaForraje.findMany({
           where,
           include: {
             _count: {
@@ -106,7 +107,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
           take: limitNum,
           orderBy: { fecha: 'desc' },
         }),
-        prisma.facturaForraje.count({ where }),
+        fastify.prisma.facturaForraje.count({ where }),
       ])
 
       return reply.send({ success: true, data, total })
@@ -135,7 +136,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { folioFactura, proveedorNombre, toneladasTotales, importe, tipoCambio, fecha, detalles } = body
 
-      const result = await prisma.facturaForraje.create({
+      const result = await fastify.prisma.facturaForraje.create({
         data: {
           folioFactura,
           proveedorNombre,
@@ -171,7 +172,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const result = await prisma.facturaForraje.findUnique({
+      const result = await fastify.prisma.facturaForraje.findUnique({
         where: { id: parseInt(id, 10) },
         include: {
           detalles: true,
@@ -205,7 +206,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { folioFactura, proveedorNombre, toneladasTotales, importe, tipoCambio, fecha, activo } = body
 
-      const existing = await prisma.facturaForraje.findUnique({
+      const existing = await fastify.prisma.facturaForraje.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -213,7 +214,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'FacturaForraje no encontrada' })
       }
 
-      const result = await prisma.facturaForraje.update({
+      const result = await fastify.prisma.facturaForraje.update({
         where: { id: parseInt(id, 10) },
         data: {
           ...(folioFactura !== undefined && { folioFactura }),
@@ -238,7 +239,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.facturaForraje.findUnique({
+      const existing = await fastify.prisma.facturaForraje.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -246,7 +247,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'FacturaForraje no encontrada' })
       }
 
-      const result = await prisma.facturaForraje.update({
+      const result = await fastify.prisma.facturaForraje.update({
         where: { id: parseInt(id, 10) },
         data: { activo: false },
       })
@@ -278,7 +279,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         where.nombre = { contains: search, mode: 'insensitive' }
       }
 
-      const data = await prisma.dieta.findMany({
+      const data = await fastify.prisma.dieta.findMany({
         where,
         include: {
           _count: {
@@ -321,7 +322,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.dieta.create({
+      const result = await fastify.prisma.dieta.create({
         data: {
           nombre,
           fechaInicio: fechaInicio ? new Date(fechaInicio) : null,
@@ -357,7 +358,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const result = await prisma.dieta.findUnique({
+      const result = await fastify.prisma.dieta.findUnique({
         where: { id: parseInt(id, 10) },
         include: {
           detalles: true,
@@ -403,7 +404,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { nombre, fechaInicio, fechaFin, activo } = body
 
-      const existing = await prisma.dieta.findUnique({
+      const existing = await fastify.prisma.dieta.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -411,7 +412,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Dieta no encontrada' })
       }
 
-      const result = await prisma.dieta.update({
+      const result = await fastify.prisma.dieta.update({
         where: { id: parseInt(id, 10) },
         data: {
           ...(nombre !== undefined && { nombre }),
@@ -433,7 +434,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.dieta.findUnique({
+      const existing = await fastify.prisma.dieta.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -441,7 +442,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Dieta no encontrada' })
       }
 
-      const result = await prisma.dieta.update({
+      const result = await fastify.prisma.dieta.update({
         where: { id: parseInt(id, 10) },
         data: { activo: false },
       })
@@ -468,7 +469,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { ingrediente, kilosBH, porcentajeMS, kilosMS, precio, costoBH } = body
 
-      const dieta = await prisma.dieta.findUnique({
+      const dieta = await fastify.prisma.dieta.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -476,7 +477,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Dieta no encontrada' })
       }
 
-      const result = await prisma.dietaDetalle.create({
+      const result = await fastify.prisma.dietaDetalle.create({
         data: {
           dietaId: parseInt(id, 10),
           ingrediente,
@@ -510,7 +511,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { ingrediente, kilosBH, porcentajeMS, kilosMS, precio, costoBH } = body
 
-      const existing = await prisma.dietaDetalle.findFirst({
+      const existing = await fastify.prisma.dietaDetalle.findFirst({
         where: {
           id: parseInt(detalleId, 10),
           dietaId: parseInt(id, 10),
@@ -521,7 +522,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'DietaDetalle no encontrado' })
       }
 
-      const result = await prisma.dietaDetalle.update({
+      const result = await fastify.prisma.dietaDetalle.update({
         where: { id: parseInt(detalleId, 10) },
         data: {
           ...(ingrediente !== undefined && { ingrediente }),
@@ -545,7 +546,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id, detalleId } = request.params as { id: string; detalleId: string }
 
-      const existing = await prisma.dietaDetalle.findFirst({
+      const existing = await fastify.prisma.dietaDetalle.findFirst({
         where: {
           id: parseInt(detalleId, 10),
           dietaId: parseInt(id, 10),
@@ -556,7 +557,7 @@ const alimentacionRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'DietaDetalle no encontrado' })
       }
 
-      const result = await prisma.dietaDetalle.delete({
+      const result = await fastify.prisma.dietaDetalle.delete({
         where: { id: parseInt(detalleId, 10) },
       })
 

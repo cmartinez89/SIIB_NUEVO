@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 
 interface DetalleItem {
   id: number
@@ -233,7 +232,7 @@ export default function OrdenesCompra() {
   const hasFilters = search || fechaDesde || fechaHasta
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200">
@@ -418,6 +417,6 @@ export default function OrdenesCompra() {
       {selectedOrden && (
         <DetailModal orden={selectedOrden} onClose={() => setSelectedOrden(null)} />
       )}
-    </Layout>
+    </>
   )
 }

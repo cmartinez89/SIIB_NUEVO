@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
@@ -192,7 +191,7 @@ export default function PrenominaList() {
   }
 
   return (
-    <Layout title="Pre-Nómina">
+    <>
       {/* Stats cards */}
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-pulse">
@@ -461,6 +460,6 @@ export default function PrenominaList() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   )
 }

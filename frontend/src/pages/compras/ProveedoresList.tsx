@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 
 interface Proveedor {
   id: number
@@ -266,7 +265,7 @@ export default function ProveedoresList() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200">
@@ -409,6 +408,6 @@ export default function ProveedoresList() {
           onSuccess={handleModalSuccess}
         />
       )}
-    </Layout>
+    </>
   )
 }

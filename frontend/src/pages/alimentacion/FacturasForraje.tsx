@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface FacturaForraje {
@@ -66,7 +65,7 @@ export default function FacturasForraje() {
   const totalImporteMXN = filtered.reduce((acc, f) => acc + f.importeUSD * f.tipoCambio, 0)
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-stone-50 p-6">
         {/* Page header */}
         <div className="flex items-center justify-between mb-6">
@@ -234,6 +233,6 @@ export default function FacturasForraje() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

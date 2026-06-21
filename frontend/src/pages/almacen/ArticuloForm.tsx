@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -217,15 +216,15 @@ export default function ArticuloForm() {
   // ── Loading state for edit ──
   if (!isCreate && articuloLoading) {
     return (
-      <Layout>
+      <>
         <Spinner label="Cargando artículo…" />
-      </Layout>
+      </>
     )
   }
 
   if (!isCreate && articuloError) {
     return (
-      <Layout>
+      <>
         <div className="max-w-xl mx-auto px-4 py-16 text-center">
           <p className="text-red-600 font-medium text-lg">Error al cargar el artículo</p>
           <p className="text-sm text-gray-500 mt-2">
@@ -240,13 +239,13 @@ export default function ArticuloForm() {
             Volver al inventario
           </button>
         </div>
-      </Layout>
+      </>
     )
   }
 
   // ── Render ──
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50 px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Breadcrumb */}
@@ -415,6 +414,6 @@ export default function ArticuloForm() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

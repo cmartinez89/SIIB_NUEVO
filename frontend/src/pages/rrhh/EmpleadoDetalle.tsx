@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
@@ -212,7 +211,7 @@ export default function EmpleadoDetalle() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <svg className="animate-spin h-10 w-10 text-blue-500" fill="none" viewBox="0 0 24 24">
@@ -222,14 +221,14 @@ export default function EmpleadoDetalle() {
             <p className="text-gray-500">Cargando información del empleado...</p>
           </div>
         </div>
-      </Layout>
+      </>
     )
   }
 
   if (isError || !empleado) {
     const errMsg = (error as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'No se pudo cargar la información del empleado.'
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="bg-white rounded-xl border border-red-200 p-8 max-w-md text-center">
             <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -244,7 +243,7 @@ export default function EmpleadoDetalle() {
             </Button>
           </div>
         </div>
-      </Layout>
+      </>
     )
   }
 
@@ -257,7 +256,7 @@ export default function EmpleadoDetalle() {
   const totalPagadoAnio = nominaYear.reduce((sum, n) => sum + n.neto, 0)
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -499,6 +498,6 @@ export default function EmpleadoDetalle() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

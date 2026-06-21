@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
@@ -258,7 +257,7 @@ export default function RecibosNomina() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -395,6 +394,6 @@ export default function RecibosNomina() {
       </div>
 
       {viewRow && <ReciboModal row={viewRow} onClose={() => setViewRow(null)} />}
-    </Layout>
+    </>
   )
 }

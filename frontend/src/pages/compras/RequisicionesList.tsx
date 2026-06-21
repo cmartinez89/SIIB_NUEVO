@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
+import { api } from '../../lib/api'
 
 interface Requisicion {
   id: number
@@ -67,15 +67,10 @@ function Spinner() {
 }
 
 async function fetchRequisiciones(filters: { statusId?: string; search?: string }): Promise<ApiResponse> {
-  const token = localStorage.getItem('token')
-  const params = new URLSearchParams()
-  if (filters.statusId) params.set('statusId', filters.statusId)
-  if (filters.search)   params.set('search', filters.search)
-  const res = await fetch(`http://localhost:3001/api/compras/requisiciones?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  if (!res.ok) throw new Error(`Error ${res.status}`)
-  return res.json()
+  const params: Record<string, string> = {}
+  if (filters.statusId) params.statusId = filters.statusId
+  if (filters.search)   params.search = filters.search
+  return api.get<ApiResponse>('/compras/requisiciones', params)
 }
 
 export default function RequisicionesList() {
@@ -99,7 +94,7 @@ export default function RequisicionesList() {
   const requisiciones = data?.data ?? []
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200">
@@ -252,6 +247,6 @@ export default function RequisicionesList() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

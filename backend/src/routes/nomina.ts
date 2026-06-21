@@ -1,7 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma } from '../lib/prisma'
 
 const nominaRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
   // GET /resumen — MUST be before /:id to avoid route conflict
   fastify.get('/resumen', async (request, reply) => {
     try {
@@ -9,10 +10,10 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
       const [totalNominas, nominasMes, totalPagoResult] = await Promise.all([
-        prisma.nominaGrupo.count({
+        fastify.prisma.nominaGrupo.count({
           where: { activo: true },
         }),
-        prisma.nominaGrupo.count({
+        fastify.prisma.nominaGrupo.count({
           where: {
             activo: true,
             createdAt: {
@@ -20,7 +21,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
             },
           },
         }),
-        prisma.nominaDetalle.aggregate({
+        fastify.prisma.nominaDetalle.aggregate({
           where: {
             nominaGrupo: { activo: true },
           },
@@ -59,7 +60,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
       const skip = (pageNum - 1) * limitNum
 
       const [data, total] = await Promise.all([
-        prisma.nominaGrupo.findMany({
+        fastify.prisma.nominaGrupo.findMany({
           where: { activo: true },
           include: {
             _count: {
@@ -70,7 +71,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
           take: limitNum,
           orderBy: { createdAt: 'desc' },
         }),
-        prisma.nominaGrupo.count({ where: { activo: true } }),
+        fastify.prisma.nominaGrupo.count({ where: { activo: true } }),
       ])
 
       return reply.send({ success: true, data, total })
@@ -101,7 +102,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.nominaGrupo.create({
+      const result = await fastify.prisma.nominaGrupo.create({
         data: {
           folio,
           periodo,
@@ -125,7 +126,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const result = await prisma.nominaGrupo.findUnique({
+      const result = await fastify.prisma.nominaGrupo.findUnique({
         where: { id: parseInt(id, 10) },
         include: {
           detalles: {
@@ -162,7 +163,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { folio, periodo, fechaInicio, fechaFin, fechaPago, status } = body
 
-      const existing = await prisma.nominaGrupo.findUnique({
+      const existing = await fastify.prisma.nominaGrupo.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -170,7 +171,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'NominaGrupo no encontrado' })
       }
 
-      const result = await prisma.nominaGrupo.update({
+      const result = await fastify.prisma.nominaGrupo.update({
         where: { id: parseInt(id, 10) },
         data: {
           ...(folio !== undefined && { folio }),
@@ -194,7 +195,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.nominaGrupo.findUnique({
+      const existing = await fastify.prisma.nominaGrupo.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -202,7 +203,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'NominaGrupo no encontrado' })
       }
 
-      const result = await prisma.nominaGrupo.update({
+      const result = await fastify.prisma.nominaGrupo.update({
         where: { id: parseInt(id, 10) },
         data: { activo: false },
       })
@@ -219,7 +220,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const grupo = await prisma.nominaGrupo.findUnique({
+      const grupo = await fastify.prisma.nominaGrupo.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -227,7 +228,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'NominaGrupo no encontrado' })
       }
 
-      const detalles = await prisma.nominaDetalle.findMany({
+      const detalles = await fastify.prisma.nominaDetalle.findMany({
         where: { nominaGrupoId: parseInt(id, 10) },
         include: {
           empleado: true,
@@ -261,7 +262,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const grupo = await prisma.nominaGrupo.findUnique({
+      const grupo = await fastify.prisma.nominaGrupo.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -271,7 +272,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
 
       const nominaGrupoId = parseInt(id, 10)
 
-      const result = await prisma.nominaDetalle.createMany({
+      const result = await fastify.prisma.nominaDetalle.createMany({
         data: body.detalles.map((d) => ({
           nominaGrupoId,
           empleadoId: d.empleadoId,
@@ -301,7 +302,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { totalPercepciones, totalRetenciones, pago } = body
 
-      const existing = await prisma.nominaDetalle.findFirst({
+      const existing = await fastify.prisma.nominaDetalle.findFirst({
         where: {
           id: parseInt(detalleId, 10),
           nominaGrupoId: parseInt(id, 10),
@@ -312,7 +313,7 @@ const nominaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'NominaDetalle no encontrado' })
       }
 
-      const result = await prisma.nominaDetalle.update({
+      const result = await fastify.prisma.nominaDetalle.update({
         where: { id: parseInt(detalleId, 10) },
         data: {
           ...(totalPercepciones !== undefined && { totalPercepciones }),

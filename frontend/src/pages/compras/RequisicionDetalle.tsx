@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 
 interface DetalleItem {
   id: number
@@ -136,15 +135,15 @@ export default function RequisicionDetalle() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <Spinner />
-      </Layout>
+      </>
     )
   }
 
   if (isError || !data?.data) {
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center max-w-sm">
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -159,7 +158,7 @@ export default function RequisicionDetalle() {
             </button>
           </div>
         </div>
-      </Layout>
+      </>
     )
   }
 
@@ -186,7 +185,7 @@ export default function RequisicionDetalle() {
   ]
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200">
@@ -373,6 +372,6 @@ export default function RequisicionDetalle() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

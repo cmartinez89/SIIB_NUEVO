@@ -10,6 +10,16 @@ import jwtAuthPlugin from "./plugins/jwt";
 import authRoutes from "./routes/auth";
 import usuariosRoutes from "./routes/usuarios";
 import catalogosRoutes from "./routes/catalogos";
+import nominaRoutes from "./routes/nomina";
+import rrhhRoutes from "./routes/rrhh";
+import comprasRoutes from "./routes/compras";
+import almacenRoutes from "./routes/almacen";
+import alimentacionRoutes from "./routes/alimentacion";
+import informaticaRoutes from "./routes/informatica";
+import basculaRoutes from "./routes/bascula";
+import lecheRoutes from "./routes/leche";
+import contabilidadRoutes from "./routes/contabilidad";
+import dashboardRoutes from "./routes/dashboard";
 
 const PORT = parseInt(process.env.PORT ?? "3001", 10);
 const JWT_SECRET = process.env.JWT_SECRET ?? "default_secret_please_change";
@@ -32,7 +42,7 @@ export const buildApp = async () => {
   });
 
   await app.register(cors, {
-    origin: NODE_ENV === "production" ? false : true,
+    origin: NODE_ENV === "production" ? (process.env.FRONTEND_URL ?? true) : true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -52,6 +62,16 @@ export const buildApp = async () => {
   await app.register(authRoutes, { prefix: "/api/auth" });
   await app.register(usuariosRoutes, { prefix: "/api/usuarios" });
   await app.register(catalogosRoutes, { prefix: "/api/catalogos" });
+  await app.register(nominaRoutes, { prefix: "/api/nomina" });
+  await app.register(rrhhRoutes, { prefix: "/api/rrhh" });
+  await app.register(comprasRoutes, { prefix: "/api/compras" });
+  await app.register(almacenRoutes, { prefix: "/api/almacen" });
+  await app.register(alimentacionRoutes, { prefix: "/api/alimentacion" });
+  await app.register(informaticaRoutes, { prefix: "/api/informatica" });
+  await app.register(basculaRoutes, { prefix: "/api/bascula" });
+  await app.register(lecheRoutes, { prefix: "/api/leche" });
+  await app.register(contabilidadRoutes, { prefix: "/api/contabilidad" });
+  await app.register(dashboardRoutes, { prefix: "/api/dashboard" });
 
   // ─── Health ─────────────────────────────────────────────────────────────────
   app.get("/api/health", async () => ({

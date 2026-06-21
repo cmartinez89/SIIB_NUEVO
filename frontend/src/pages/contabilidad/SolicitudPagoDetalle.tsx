@@ -1,6 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import { formatCurrency } from '../../lib/utils'
 
@@ -43,14 +42,14 @@ export default function SolicitudPagoDetalle() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['solicitud-pago', id] }),
   })
 
-  if (isLoading) return <Layout><div className="p-8 text-center text-gray-400">Cargando solicitud...</div></Layout>
-  if (!data?.data) return <Layout><div className="p-8 text-center text-red-500">Solicitud no encontrada</div></Layout>
+  if (isLoading) return <div className="p-8 text-center text-gray-400">Cargando solicitud...</div>
+  if (!data?.data) return <div className="p-8 text-center text-red-500">Solicitud no encontrada</div>
 
   const sol = data.data
   const st = STATUS[sol.statusId] ?? { label: 'Desconocido', cls: 'bg-gray-100 text-gray-600' }
 
   return (
-    <Layout>
+    <>
       <div className="p-6 max-w-3xl mx-auto">
         <button onClick={() => navigate('/contabilidad')} className="text-sm text-blue-600 hover:underline mb-4">← Volver</button>
 
@@ -128,6 +127,6 @@ export default function SolicitudPagoDetalle() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   )
 }

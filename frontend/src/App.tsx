@@ -5,26 +5,67 @@ import Layout from '@/components/layout/Layout'
 import Login from '@/pages/auth/Login'
 import Dashboard from '@/pages/Dashboard'
 
-// ─── Protected Route ────────────────────────────────────────────────────────
+// Nómina
+import NominaIndex from '@/pages/nomina/NominaIndex'
+import PrenominaList from '@/pages/nomina/PrenominaList'
+import PrenominaDetalle from '@/pages/nomina/PrenominaDetalle'
+import RecibosNomina from '@/pages/nomina/RecibosNomina'
+import Checador from '@/pages/nomina/Checador'
+import TEF from '@/pages/nomina/TEF'
+
+// RRHH
+import EmpleadosList from '@/pages/rrhh/EmpleadosList'
+import EmpleadoForm from '@/pages/rrhh/EmpleadoForm'
+import EmpleadoDetalle from '@/pages/rrhh/EmpleadoDetalle'
+
+// Compras
+import RequisicionesList from '@/pages/compras/RequisicionesList'
+import RequisicionForm from '@/pages/compras/RequisicionForm'
+import RequisicionDetalle from '@/pages/compras/RequisicionDetalle'
+import ProveedoresList from '@/pages/compras/ProveedoresList'
+import OrdenesCompra from '@/pages/compras/OrdenesCompra'
+
+// Almacén
+import InventarioList from '@/pages/almacen/InventarioList'
+import ArticuloForm from '@/pages/almacen/ArticuloForm'
+import MovimientosList from '@/pages/almacen/MovimientosList'
+import SolicitudesAlmacen from '@/pages/almacen/SolicitudesAlmacen'
+
+// Alimentación
+import DietasList from '@/pages/alimentacion/DietasList'
+import DietaForm from '@/pages/alimentacion/DietaForm'
+import DietaDetalle from '@/pages/alimentacion/DietaDetalle'
+import FacturasForraje from '@/pages/alimentacion/FacturasForraje'
+import FacturaForrajeForm from '@/pages/alimentacion/FacturaForrajeForm'
+
+// Informática
+import AnimalesList from '@/pages/informatica/AnimalesList'
+import AnimalForm from '@/pages/informatica/AnimalForm'
+import AnimalDetalle from '@/pages/informatica/AnimalDetalle'
+import LotesList from '@/pages/informatica/LotesList'
+import PartosList from '@/pages/informatica/PartosList'
+
+// Báscula
+import FichasBascula from '@/pages/bascula/FichasBascula'
+import FichaBasculaForm from '@/pages/bascula/FichaBasculaForm'
+import FichaBasculaDetalle from '@/pages/bascula/FichaBasculaDetalle'
+
+// Leche
+import EnviosLeche from '@/pages/leche/EnviosLeche'
+import EnvioLecheForm from '@/pages/leche/EnvioLecheForm'
+import ProgramacionSemanal from '@/pages/leche/ProgramacionSemanal'
+
+// Contabilidad
+import SolicitudesPago from '@/pages/contabilidad/SolicitudesPago'
+import SolicitudPagoForm from '@/pages/contabilidad/SolicitudPagoForm'
+import SolicitudPagoDetalle from '@/pages/contabilidad/SolicitudPagoDetalle'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   if (!isAuthenticated) return <Navigate to="/login" replace />
   return <>{children}</>
 }
 
-// ─── Placeholder Page ────────────────────────────────────────────────────────
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div className="p-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">{title}</h1>
-        <p className="text-gray-500">Módulo en desarrollo</p>
-      </div>
-    </div>
-  )
-}
-
-// ─── App ─────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <Routes>
@@ -41,54 +82,64 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
 
         {/* Nómina */}
-        <Route path="/nomina" element={<PlaceholderPage title="Nómina" />} />
-        <Route path="/nomina/prenomina" element={<PlaceholderPage title="Pre-Nómina" />} />
-        <Route path="/nomina/recibos" element={<PlaceholderPage title="Recibos" />} />
-        <Route path="/nomina/checador" element={<PlaceholderPage title="Checador" />} />
-        <Route path="/nomina/tef" element={<PlaceholderPage title="TEF" />} />
-        <Route path="/nomina/vacaciones" element={<PlaceholderPage title="Vacaciones" />} />
+        <Route path="/nomina" element={<NominaIndex />} />
+        <Route path="/nomina/prenomina" element={<PrenominaList />} />
+        <Route path="/nomina/prenomina/:id" element={<PrenominaDetalle />} />
+        <Route path="/nomina/recibos" element={<RecibosNomina />} />
+        <Route path="/nomina/checador" element={<Checador />} />
+        <Route path="/nomina/tef" element={<TEF />} />
 
-        {/* RR.HH. */}
-        <Route path="/rrhh/empleados" element={<PlaceholderPage title="Empleados" />} />
-        <Route path="/rrhh/puestos" element={<PlaceholderPage title="Puestos" />} />
-        <Route path="/rrhh/departamentos" element={<PlaceholderPage title="Departamentos" />} />
+        {/* RRHH */}
+        <Route path="/rrhh/empleados" element={<EmpleadosList />} />
+        <Route path="/rrhh/empleados/nuevo" element={<EmpleadoForm />} />
+        <Route path="/rrhh/empleados/:id" element={<EmpleadoDetalle />} />
+        <Route path="/rrhh/empleados/:id/editar" element={<EmpleadoForm />} />
 
         {/* Compras */}
-        <Route path="/compras/requisiciones" element={<PlaceholderPage title="Requisiciones" />} />
-        <Route path="/compras/cotizaciones" element={<PlaceholderPage title="Cotizaciones" />} />
-        <Route path="/compras/ordenes" element={<PlaceholderPage title="Órdenes de Compra" />} />
-        <Route path="/compras/proveedores" element={<PlaceholderPage title="Proveedores" />} />
+        <Route path="/compras/requisiciones" element={<RequisicionesList />} />
+        <Route path="/compras/requisiciones/nueva" element={<RequisicionForm />} />
+        <Route path="/compras/requisiciones/:id" element={<RequisicionDetalle />} />
+        <Route path="/compras/ordenes" element={<OrdenesCompra />} />
+        <Route path="/compras/proveedores" element={<ProveedoresList />} />
 
         {/* Almacén */}
-        <Route path="/almacen/inventario" element={<PlaceholderPage title="Inventario" />} />
-        <Route path="/almacen/articulos" element={<PlaceholderPage title="Artículos" />} />
-        <Route path="/almacen/movimientos" element={<PlaceholderPage title="Movimientos" />} />
-        <Route path="/almacen/solicitudes" element={<PlaceholderPage title="Solicitudes de Almacén" />} />
+        <Route path="/almacen/inventario" element={<InventarioList />} />
+        <Route path="/almacen/articulos/nuevo" element={<ArticuloForm />} />
+        <Route path="/almacen/movimientos" element={<MovimientosList />} />
+        <Route path="/almacen/solicitudes" element={<SolicitudesAlmacen />} />
 
         {/* Alimentación */}
-        <Route path="/alimentacion/dietas" element={<PlaceholderPage title="Dietas" />} />
-        <Route path="/alimentacion/forrajes" element={<PlaceholderPage title="Forrajes" />} />
-        <Route path="/alimentacion/programas" element={<PlaceholderPage title="Programas de Alimentación" />} />
+        <Route path="/alimentacion/dietas" element={<DietasList />} />
+        <Route path="/alimentacion/dietas/nueva" element={<DietaForm />} />
+        <Route path="/alimentacion/dietas/:id" element={<DietaDetalle />} />
+        <Route path="/alimentacion/forrajes" element={<FacturasForraje />} />
+        <Route path="/alimentacion/forrajes/nueva" element={<FacturaForrajeForm />} />
 
-        {/* Informática Bovina */}
-        <Route path="/informatica/animales" element={<PlaceholderPage title="Animales" />} />
-        <Route path="/informatica/lotes" element={<PlaceholderPage title="Lotes" />} />
-        <Route path="/informatica/partos" element={<PlaceholderPage title="Partos" />} />
+        {/* Informática */}
+        <Route path="/informatica/animales" element={<AnimalesList />} />
+        <Route path="/informatica/animales/nuevo" element={<AnimalForm />} />
+        <Route path="/informatica/animales/:id" element={<AnimalDetalle />} />
+        <Route path="/informatica/lotes" element={<LotesList />} />
+        <Route path="/informatica/partos" element={<PartosList />} />
 
         {/* Báscula */}
-        <Route path="/bascula/fichas" element={<PlaceholderPage title="Fichas de Báscula" />} />
-        <Route path="/bascula/movimientos" element={<PlaceholderPage title="Movimientos de Báscula" />} />
+        <Route path="/bascula/fichas" element={<FichasBascula />} />
+        <Route path="/bascula/fichas/nueva" element={<FichaBasculaForm />} />
+        <Route path="/bascula/fichas/:id" element={<FichaBasculaDetalle />} />
 
         {/* Leche */}
-        <Route path="/leche/envios" element={<PlaceholderPage title="Envíos de Leche" />} />
-        <Route path="/leche/programacion" element={<PlaceholderPage title="Programación de Leche" />} />
+        <Route path="/leche" element={<EnviosLeche />} />
+        <Route path="/leche/envios" element={<EnviosLeche />} />
+        <Route path="/leche/nuevo" element={<EnvioLecheForm />} />
+        <Route path="/leche/programacion" element={<ProgramacionSemanal />} />
 
         {/* Contabilidad */}
-        <Route path="/contabilidad/solicitudes" element={<PlaceholderPage title="Solicitudes de Pago" />} />
-        <Route path="/contabilidad/presupuestos" element={<PlaceholderPage title="Presupuestos" />} />
+        <Route path="/contabilidad" element={<SolicitudesPago />} />
+        <Route path="/contabilidad/solicitudes" element={<SolicitudesPago />} />
+        <Route path="/contabilidad/nueva-solicitud" element={<SolicitudPagoForm />} />
+        <Route path="/contabilidad/solicitud/:id" element={<SolicitudPagoDetalle />} />
       </Route>
 
-      {/* Catch-all */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   )

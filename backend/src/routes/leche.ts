@@ -1,6 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
 
 const lecheRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
   // GET /resumen — MUST be before /:id
   fastify.get('/resumen', async (request, reply) => {
     try {

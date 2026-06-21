@@ -1,7 +1,8 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma } from '../lib/prisma'
 
 const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
   // ─── RESUMEN ─────────────────────────────────────────────────────────────────
 
   // GET /resumen — MUST be first to avoid route conflicts
@@ -11,18 +12,18 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
       const [totalAnimales, animalesActivos, partosMes, totalLotes] = await Promise.all([
-        prisma.animal.count(),
-        prisma.animal.count({
+        fastify.prisma.animal.count(),
+        fastify.prisma.animal.count({
           where: { activo: true },
         }),
-        prisma.parto.count({
+        fastify.prisma.parto.count({
           where: {
             fechaParto: {
               gte: startOfMonth,
             },
           },
         }),
-        prisma.lote.count({
+        fastify.prisma.lote.count({
           where: { activo: true },
         }),
       ])
@@ -75,7 +76,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         ]
       }
 
-      const data = await prisma.animal.findMany({
+      const data = await fastify.prisma.animal.findMany({
         where,
         include: {
           lote: true,
@@ -111,7 +112,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const areteExisting = await prisma.animal.findUnique({
+      const areteExisting = await fastify.prisma.animal.findUnique({
         where: { arete },
       })
 
@@ -122,7 +123,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.animal.create({
+      const result = await fastify.prisma.animal.create({
         data: {
           arete,
           nombre,
@@ -148,7 +149,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const result = await prisma.animal.findUnique({
+      const result = await fastify.prisma.animal.findUnique({
         where: { id: parseInt(id, 10) },
         include: {
           lote: true,
@@ -184,7 +185,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { arete, nombre, sexo, fechaNacimiento, loteId, activo } = body
 
-      const existing = await prisma.animal.findUnique({
+      const existing = await fastify.prisma.animal.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -193,7 +194,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
       }
 
       if (arete && arete !== existing.arete) {
-        const areteConflict = await prisma.animal.findUnique({ where: { arete } })
+        const areteConflict = await fastify.prisma.animal.findUnique({ where: { arete } })
         if (areteConflict) {
           return reply.status(409).send({
             success: false,
@@ -202,7 +203,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         }
       }
 
-      const result = await prisma.animal.update({
+      const result = await fastify.prisma.animal.update({
         where: { id: parseInt(id, 10) },
         data: {
           ...(arete !== undefined && { arete }),
@@ -226,7 +227,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.animal.findUnique({
+      const existing = await fastify.prisma.animal.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -234,7 +235,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Animal no encontrado' })
       }
 
-      const result = await prisma.animal.update({
+      const result = await fastify.prisma.animal.update({
         where: { id: parseInt(id, 10) },
         data: { activo: false },
       })
@@ -251,7 +252,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
   // GET /lotes — lista con conteo de animales activos
   fastify.get('/lotes', async (request, reply) => {
     try {
-      const data = await prisma.lote.findMany({
+      const data = await fastify.prisma.lote.findMany({
         include: {
           _count: {
             select: {
@@ -285,7 +286,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.lote.create({
+      const result = await fastify.prisma.lote.create({
         data: {
           nombre,
           activo: true,
@@ -310,7 +311,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
 
       const { nombre, activo } = body
 
-      const existing = await prisma.lote.findUnique({
+      const existing = await fastify.prisma.lote.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -318,7 +319,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Lote no encontrado' })
       }
 
-      const result = await prisma.lote.update({
+      const result = await fastify.prisma.lote.update({
         where: { id: parseInt(id, 10) },
         data: {
           ...(nombre !== undefined && { nombre }),
@@ -338,7 +339,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
     try {
       const { id } = request.params as { id: string }
 
-      const existing = await prisma.lote.findUnique({
+      const existing = await fastify.prisma.lote.findUnique({
         where: { id: parseInt(id, 10) },
       })
 
@@ -346,7 +347,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Lote no encontrado' })
       }
 
-      const animalesActivos = await prisma.animal.count({
+      const animalesActivos = await fastify.prisma.animal.count({
         where: {
           loteId: parseInt(id, 10),
           activo: true,
@@ -360,7 +361,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const result = await prisma.lote.delete({
+      const result = await fastify.prisma.lote.delete({
         where: { id: parseInt(id, 10) },
       })
 
@@ -400,7 +401,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         where.fechaParto = fechaFilter
       }
 
-      const data = await prisma.parto.findMany({
+      const data = await fastify.prisma.parto.findMany({
         where,
         include: {
           animal: true,
@@ -434,7 +435,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         })
       }
 
-      const animal = await prisma.animal.findUnique({
+      const animal = await fastify.prisma.animal.findUnique({
         where: { id: animalId },
       })
 
@@ -442,7 +443,7 @@ const informaticaRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ success: false, error: 'Animal no encontrado' })
       }
 
-      const result = await prisma.parto.create({
+      const result = await fastify.prisma.parto.create({
         data: {
           animalId,
           fechaParto: fechaParto ? new Date(fechaParto) : null,

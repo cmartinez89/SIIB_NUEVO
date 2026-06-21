@@ -70,7 +70,7 @@ model NominaGrupo {
   fechaInicio   DateTime?
   fechaFin      DateTime?
   fechaPago     DateTime?
-  status        Int             @default(1)
+  status        String          @default("BORRADOR")
   activo        Boolean         @default(true)
   createdAt     DateTime        @default(now())
   detalles      NominaDetalle[]
@@ -95,9 +95,9 @@ model Requisicion {
   statusId    Int                  @default(1)
   activo      Boolean              @default(true)
   cotizada    Boolean              @default(false)
-  aut1Status  Boolean?
-  aut2Status  Boolean?
-  aut3Status  Boolean?
+  aut1Status  String          @default("PENDIENTE")
+  aut2Status  String          @default("PENDIENTE")
+  aut3Status  String          @default("PENDIENTE")
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
   detalles    RequisicionDetalle[]

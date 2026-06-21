@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
@@ -369,7 +368,7 @@ export default function NominaIndex() {
   }
 
   return (
-    <Layout title="Nómina">
+    <>
       {/* Stats bar */}
       {resumenLoading ? (
         <StatSkeleton />
@@ -600,6 +599,6 @@ export default function NominaIndex() {
         editData={editTarget}
         onSuccess={handleSuccess}
       />
-    </Layout>
+    </>
   )
 }

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface ConceptoRow {
@@ -132,16 +131,16 @@ export default function FacturaForrajeForm() {
 
   if (isEdit && loadingFactura) {
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-stone-50 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-stone-200 border-t-green-600 rounded-full animate-spin" />
         </div>
-      </Layout>
+      </>
     )
   }
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-stone-50 p-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -365,6 +364,6 @@ export default function FacturaForrajeForm() {
           </form>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

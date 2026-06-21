@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface DietaDetalle {
@@ -88,7 +87,7 @@ export default function DietasList() {
   )
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-stone-50 p-6">
         {/* Page header */}
         <div className="flex items-center justify-between mb-6">
@@ -200,6 +199,6 @@ export default function DietasList() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

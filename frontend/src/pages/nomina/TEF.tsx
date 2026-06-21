@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import { formatCurrency } from '../../lib/utils'
 
@@ -46,7 +45,7 @@ export default function TEF() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -131,6 +130,6 @@ export default function TEF() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

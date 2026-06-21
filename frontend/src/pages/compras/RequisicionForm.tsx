@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 
 interface HeaderFields {
   concepto: string
@@ -105,7 +104,7 @@ export default function RequisicionForm() {
   })
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
         <div className="bg-white border-b border-gray-200">
@@ -309,6 +308,6 @@ export default function RequisicionForm() {
           </div>
         </form>
       </div>
-    </Layout>
+    </>
   )
 }

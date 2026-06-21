@@ -1,7 +1,6 @@
 import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams, Link } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface DietaDetalle {
@@ -99,17 +98,17 @@ export default function DietaDetalleView() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-stone-50 flex items-center justify-center">
           <div className="w-8 h-8 border-4 border-stone-200 border-t-green-600 rounded-full animate-spin" />
         </div>
-      </Layout>
+      </>
     )
   }
 
   if (isError || !dieta) {
     return (
-      <Layout>
+      <>
         <div className="min-h-screen bg-stone-50 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 text-sm mb-4">
@@ -125,7 +124,7 @@ export default function DietaDetalleView() {
             </Link>
           </div>
         </div>
-      </Layout>
+      </>
     )
   }
 
@@ -147,7 +146,7 @@ export default function DietaDetalleView() {
   ]
 
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-stone-50 p-6">
         <div className="max-w-5xl mx-auto">
           {/* Back link */}
@@ -302,6 +301,6 @@ export default function DietaDetalleView() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

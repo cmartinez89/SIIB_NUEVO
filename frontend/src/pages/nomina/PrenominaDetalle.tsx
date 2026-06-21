@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Badge from '../../components/ui/Badge'
@@ -174,24 +173,24 @@ export default function PrenominaDetalle() {
 
   if (isLoading) {
     return (
-      <Layout>
+      <>
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
         </div>
-      </Layout>
+      </>
     )
   }
 
   if (isError || !nomina) {
     return (
-      <Layout>
+      <>
         <div className="text-center py-16 text-red-600">No se encontró la prenómina.</div>
-      </Layout>
+      </>
     )
   }
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -456,6 +455,6 @@ export default function PrenominaDetalle() {
           </div>
         </div>
       )}
-    </Layout>
+    </>
   )
 }

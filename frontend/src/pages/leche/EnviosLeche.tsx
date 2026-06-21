@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import { formatCurrency } from '../../lib/utils'
 
@@ -48,7 +47,7 @@ export default function EnviosLeche() {
   const importeTotal = data?.resumen?.importeTotal ?? envios.reduce((s, e) => s + (e.importe ?? 0), 0)
 
   return (
-    <Layout>
+    <>
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -140,6 +139,6 @@ export default function EnviosLeche() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

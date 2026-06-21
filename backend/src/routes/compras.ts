@@ -1,8 +1,10 @@
 import { FastifyInstance } from 'fastify'
 
 export default async function comprasRoutes(fastify: FastifyInstance) {
-  // GET /api/compras/requisiciones
-  fastify.get('/api/compras/requisiciones', async (request, reply) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
+  // GET /requisiciones
+  fastify.get('/requisiciones', async (request, reply) => {
     try {
       const { statusId, search, page = '1', limit = '20' } = request.query as {
         statusId?: string
@@ -47,7 +49,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/requisiciones
-  fastify.post('/api/compras/requisiciones', async (request, reply) => {
+  fastify.post('/requisiciones', async (request, reply) => {
     try {
       const body = request.body as {
         folio: string
@@ -98,7 +100,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/compras/requisiciones/:id
-  fastify.get('/api/compras/requisiciones/:id', async (request, reply) => {
+  fastify.get('/requisiciones/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -119,7 +121,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // PUT /api/compras/requisiciones/:id
-  fastify.put('/api/compras/requisiciones/:id', async (request, reply) => {
+  fastify.put('/requisiciones/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
       const body = request.body as {
@@ -156,7 +158,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // DELETE /api/compras/requisiciones/:id — soft delete
-  fastify.delete('/api/compras/requisiciones/:id', async (request, reply) => {
+  fastify.delete('/requisiciones/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -181,7 +183,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/requisiciones/:id/detalles
-  fastify.post('/api/compras/requisiciones/:id/detalles', async (request, reply) => {
+  fastify.post('/requisiciones/:id/detalles', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
       const body = request.body as {
@@ -221,7 +223,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // DELETE /api/compras/requisiciones/:id/detalles/:detalleId
-  fastify.delete('/api/compras/requisiciones/:id/detalles/:detalleId', async (request, reply) => {
+  fastify.delete('/requisiciones/:id/detalles/:detalleId', async (request, reply) => {
     try {
       const { id, detalleId } = request.params as { id: string; detalleId: string }
 
@@ -248,7 +250,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/requisiciones/:id/autorizar/1
-  fastify.post('/api/compras/requisiciones/:id/autorizar/1', async (request, reply) => {
+  fastify.post('/requisiciones/:id/autorizar/1', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -274,7 +276,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/requisiciones/:id/autorizar/2
-  fastify.post('/api/compras/requisiciones/:id/autorizar/2', async (request, reply) => {
+  fastify.post('/requisiciones/:id/autorizar/2', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -300,7 +302,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/requisiciones/:id/autorizar/3
-  fastify.post('/api/compras/requisiciones/:id/autorizar/3', async (request, reply) => {
+  fastify.post('/requisiciones/:id/autorizar/3', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
 
@@ -326,7 +328,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/compras/proveedores
-  fastify.get('/api/compras/proveedores', async (request, reply) => {
+  fastify.get('/proveedores', async (request, reply) => {
     try {
       const { search, page = '1', limit = '20' } = request.query as {
         search?: string
@@ -365,7 +367,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // POST /api/compras/proveedores
-  fastify.post('/api/compras/proveedores', async (request, reply) => {
+  fastify.post('/proveedores', async (request, reply) => {
     try {
       const body = request.body as {
         nombre: string
@@ -392,7 +394,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // PUT /api/compras/proveedores/:id
-  fastify.put('/api/compras/proveedores/:id', async (request, reply) => {
+  fastify.put('/proveedores/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string }
       const body = request.body as {
@@ -426,7 +428,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
   })
 
   // GET /api/compras/resumen
-  fastify.get('/api/compras/resumen', async (_request, reply) => {
+  fastify.get('/resumen', async (_request, reply) => {
     try {
       const [totalRequisiciones, pendientesAutorizar, ordenesAbiertas] = await Promise.all([
         fastify.prisma.requisicion.count({ where: { activo: true } }),

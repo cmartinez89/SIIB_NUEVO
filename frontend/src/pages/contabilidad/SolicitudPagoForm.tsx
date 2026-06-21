@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 import { formatCurrency } from '../../lib/utils'
 
@@ -31,7 +30,7 @@ export default function SolicitudPagoForm() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="p-6 max-w-3xl mx-auto">
         <button onClick={() => navigate('/contabilidad')} className="text-sm text-blue-600 hover:underline mb-4">← Volver</button>
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Nueva Solicitud de Pago</h1>
@@ -105,6 +104,6 @@ export default function SolicitudPagoForm() {
           </div>
         </form>
       </div>
-    </Layout>
+    </>
   )
 }

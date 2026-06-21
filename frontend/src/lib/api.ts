@@ -72,4 +72,13 @@ async function del<T>(path: string): Promise<T> {
   return handleResponse<T>(res)
 }
 
-export const api = { get, post, put, del }
+async function patch<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: 'PATCH',
+    headers: buildHeaders(),
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+  return handleResponse<T>(res)
+}
+
+export const api = { get, post, put, del, delete: del, patch }

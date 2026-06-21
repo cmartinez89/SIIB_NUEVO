@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
-import Layout from '../../components/layout/Layout'
 
 interface Animal {
   id: number
@@ -97,7 +96,7 @@ export default function AnimalesList() {
   })
 
   return (
-    <Layout>
+    <>
       <div className="space-y-6">
         {/* Page header */}
         <div className="flex items-center justify-between">
@@ -254,6 +253,6 @@ export default function AnimalesList() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }

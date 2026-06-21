@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import Layout from '../../components/layout/Layout'
 import { api } from '../../lib/api'
 
 interface Parto {
@@ -62,7 +61,7 @@ export default function PartosList() {
   }
 
   return (
-    <Layout>
+    <>
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -168,6 +167,6 @@ export default function PartosList() {
           </div>
         )}
       </div>
-    </Layout>
+    </>
   )
 }

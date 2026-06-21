@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import Layout from '../../components/layout/Layout'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -166,7 +165,7 @@ export default function MovimientosList() {
 
   // ── Render ──
   return (
-    <Layout>
+    <>
       <div className="min-h-screen bg-gray-50 px-4 py-8 max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -400,6 +399,6 @@ export default function MovimientosList() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   )
 }
