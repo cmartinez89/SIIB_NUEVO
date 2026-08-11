@@ -1,7 +1,10 @@
 import { FastifyPluginAsync } from 'fastify'
-import { prisma } from '../lib/prisma'
 
 const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
+  fastify.addHook('onRequest', fastify.authenticate)
+
+  const prisma = fastify.prisma
+
   // GET /kpis — todos los KPIs del sistema
   fastify.get('/kpis', async (request, reply) => {
     try {
