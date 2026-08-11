@@ -226,6 +226,19 @@ npx prisma migrate reset   # Borra todo y re-crea desde cero
 
 ---
 
+## Estado de la Migración
+
+**Fase 0 (críticos) — completada 2026-08-11:**
+
+- ✅ Autenticación agregada a todas las rutas de negocio, incluyendo `dashboard.ts` (única ruta que aún faltaba; el resto de módulos ya tenía el hook `fastify.authenticate`).
+- ✅ Eliminada la segunda instancia de `PrismaClient` (`lib/prisma.ts`, usada solo por `dashboard.ts`) — todas las rutas usan `fastify.prisma`.
+- ✅ Corregido el patrón de fetch con token/URL hardcodeados: además de `RequisicionesList.tsx` (ya corregido antes), se encontró y corrigió el mismo bug en **8 páginas más** (`ProveedoresList`, `OrdenesCompra`, `RequisicionForm`, `RequisicionDetalle`, `SolicitudesAlmacen`, `InventarioList`, `MovimientosList`, `ArticuloForm`) — todas usaban `localStorage.getItem('token')` (key incorrecta) y `fetch('http://localhost:3001/...')` hardcodeado en vez del cliente `lib/api.ts`.
+- ✅ Verificado: `aut1/2/3Status` y `NominaGrupo.status` ya eran `String` en `schema.prisma` (el mismatch de tipos documentado en versiones anteriores ya no aplica).
+
+Pendiente: ver el mapa completo de módulos faltantes y las fases 1–5 de la hoja de ruta (RBAC, Configuración multi-establo, Portal, Casetas, Báscula SAB, Reportes, etc.).
+
+---
+
 ## Comparación con Sistema Original
 
 | Aspecto | SIIB Original | SIIB_NEW |
