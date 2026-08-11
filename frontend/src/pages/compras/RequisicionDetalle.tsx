@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useParams, Link, useNavigate } from 'react-router-dom'
+import { api } from '../../lib/api'
 
 interface DetalleItem {
   id: number
@@ -63,23 +64,14 @@ function Spinner() {
 }
 
 async function fetchRequisicion(id: string): Promise<ApiResponse> {
-  const token = localStorage.getItem('token')
-  const res = await fetch(`http://localhost:3001/api/compras/requisiciones/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const json: ApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const json = await api.get<ApiResponse>(`/compras/requisiciones/${id}`)
+  if (!json.success) throw new Error(json.error ?? 'Error al cargar la requisición')
   return json
 }
 
 async function autorizarRequisicion(id: string, nivel: number): Promise<AuthResponse> {
-  const token = localStorage.getItem('token')
-  const res = await fetch(`http://localhost:3001/api/compras/requisiciones/${id}/autorizar/${nivel}`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const json: AuthResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error((json as any).error ?? `Error ${res.status}`)
+  const json = await api.post<AuthResponse>(`/compras/requisiciones/${id}/autorizar/${nivel}`)
+  if (!json.success) throw new Error((json as any).error ?? 'Error al autorizar')
   return json
 }
 

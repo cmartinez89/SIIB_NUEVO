@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm, useFieldArray } from 'react-hook-form'
+import { api } from '../../lib/api'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -36,23 +37,15 @@ interface ApiResponse<T> {
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
-const getAuthHeaders = (): HeadersInit => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
-})
-
 const fetchSolicitudes = async (): Promise<Solicitud[]> => {
-  const res = await fetch('http://localhost:3001/api/almacen/solicitudes', {
-    headers: getAuthHeaders(),
-  })
-  if (res.status === 404) return []
-  if (!res.ok) throw new Error('Error al cargar solicitudes')
-  const json: ApiResponse<Solicitud[]> = await res.json()
-  if (!json.success) {
+  try {
+    const json = await api.get<ApiResponse<Solicitud[]>>('/almacen/solicitudes')
+    if (!json.success) return []
+    return json.data ?? []
+  } catch {
     // Gracefully return empty instead of crashing on non-critical errors
     return []
   }
-  return json.data ?? []
 }
 
 const patchStatus = async ({
@@ -62,24 +55,12 @@ const patchStatus = async ({
   id: number
   status: SolicitudStatus
 }): Promise<void> => {
-  const res = await fetch(`http://localhost:3001/api/almacen/solicitudes/${id}/status`, {
-    method: 'PATCH',
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
-  })
-  if (!res.ok) throw new Error('Error al actualizar estado')
-  const json: ApiResponse<unknown> = await res.json()
+  const json = await api.patch<ApiResponse<unknown>>(`/almacen/solicitudes/${id}/status`, { status })
   if (!json.success) throw new Error(json.error ?? 'Error al actualizar estado')
 }
 
 const postSolicitud = async (data: NuevaSolicitudFormData): Promise<Solicitud> => {
-  const res = await fetch('http://localhost:3001/api/almacen/solicitudes', {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  })
-  if (!res.ok) throw new Error('Error al crear solicitud')
-  const json: ApiResponse<Solicitud> = await res.json()
+  const json = await api.post<ApiResponse<Solicitud>>('/almacen/solicitudes', data)
   if (!json.success) throw new Error(json.error ?? 'Error al crear solicitud')
   return json.data
 }

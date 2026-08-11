@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { api } from '../../lib/api'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -42,42 +43,22 @@ interface ApiResponse<T> {
 
 // ─── API helpers ─────────────────────────────────────────────────────────────
 
-const getAuthHeaders = (): HeadersInit => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
-})
-
 const fetchResumen = async (): Promise<ResumenAlmacen> => {
-  const res = await fetch('http://localhost:3001/api/almacen/resumen', {
-    headers: getAuthHeaders(),
-  })
-  if (!res.ok) throw new Error('Error al cargar resumen')
-  const json: ApiResponse<ResumenAlmacen> = await res.json()
+  const json = await api.get<ApiResponse<ResumenAlmacen>>('/almacen/resumen')
   if (!json.success) throw new Error(json.error ?? 'Error al cargar resumen')
   return json.data
 }
 
 const fetchArticulos = async (search: string): Promise<Articulo[]> => {
-  const params = new URLSearchParams()
-  if (search) params.set('search', search)
-  const res = await fetch(
-    `http://localhost:3001/api/almacen/articulos?${params.toString()}`,
-    { headers: getAuthHeaders() }
-  )
-  if (!res.ok) throw new Error('Error al cargar artículos')
-  const json: ApiResponse<Articulo[]> = await res.json()
+  const params: Record<string, string> = {}
+  if (search) params.search = search
+  const json = await api.get<ApiResponse<Articulo[]>>('/almacen/articulos', params)
   if (!json.success) throw new Error(json.error ?? 'Error al cargar artículos')
   return json.data
 }
 
 const postMovimiento = async (data: MovimientoFormData): Promise<void> => {
-  const res = await fetch('http://localhost:3001/api/almacen/movimientos', {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
-  })
-  if (!res.ok) throw new Error('Error al registrar movimiento')
-  const json: ApiResponse<unknown> = await res.json()
+  const json = await api.post<ApiResponse<unknown>>('/almacen/movimientos', data)
   if (!json.success) throw new Error(json.error ?? 'Error al registrar movimiento')
 }
 

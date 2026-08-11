@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { api } from '../../lib/api'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -55,26 +56,16 @@ const tipoLabels: Record<TipoMovimiento, string> = {
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
-const getAuthHeaders = (): HeadersInit => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
-})
-
 const fetchMovimientos = async (filters: MovimientosFilters): Promise<MovimientosResponse> => {
-  const params = new URLSearchParams()
-  if (filters.fechaDesde) params.set('fechaDesde', filters.fechaDesde)
-  if (filters.fechaHasta) params.set('fechaHasta', filters.fechaHasta)
-  if (filters.tipo !== 'TODOS') params.set('tipo', filters.tipo)
-  if (filters.articuloNombre) params.set('articuloNombre', filters.articuloNombre)
-  params.set('page', String(filters.page))
-  params.set('limit', String(PAGE_SIZE))
+  const params: Record<string, string> = {}
+  if (filters.fechaDesde) params.fechaDesde = filters.fechaDesde
+  if (filters.fechaHasta) params.fechaHasta = filters.fechaHasta
+  if (filters.tipo !== 'TODOS') params.tipo = filters.tipo
+  if (filters.articuloNombre) params.articuloNombre = filters.articuloNombre
+  params.page = String(filters.page)
+  params.limit = String(PAGE_SIZE)
 
-  const res = await fetch(
-    `http://localhost:3001/api/almacen/movimientos?${params.toString()}`,
-    { headers: getAuthHeaders() }
-  )
-  if (!res.ok) throw new Error('Error al cargar movimientos')
-  const json: ApiResponse<Movimiento[] | MovimientosResponse> = await res.json()
+  const json = await api.get<ApiResponse<Movimiento[] | MovimientosResponse>>('/almacen/movimientos', params)
   if (!json.success) throw new Error(json.error ?? 'Error al cargar movimientos')
 
   // Handle both flat array and nested response shapes

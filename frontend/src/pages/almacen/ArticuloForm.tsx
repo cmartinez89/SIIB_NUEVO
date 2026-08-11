@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { api } from '../../lib/api'
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
@@ -47,39 +48,20 @@ interface ApiResponse<T> {
 
 // ─── API helpers ──────────────────────────────────────────────────────────────
 
-const getAuthHeaders = (): HeadersInit => ({
-  'Content-Type': 'application/json',
-  Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`,
-})
-
 const fetchArticulo = async (id: string): Promise<ArticuloDetalle> => {
-  const res = await fetch(`http://localhost:3001/api/almacen/articulos/${id}`, {
-    headers: getAuthHeaders(),
-  })
-  if (!res.ok) throw new Error('Error al cargar el artículo')
-  const json: ApiResponse<ArticuloDetalle> = await res.json()
+  const json = await api.get<ApiResponse<ArticuloDetalle>>(`/almacen/articulos/${id}`)
   if (!json.success) throw new Error(json.error ?? 'Error al cargar el artículo')
   return json.data
 }
 
 const fetchMarcas = async (): Promise<Marca[]> => {
-  const res = await fetch('http://localhost:3001/api/almacen/marcas', {
-    headers: getAuthHeaders(),
-  })
-  if (!res.ok) throw new Error('Error al cargar marcas')
-  const json: ApiResponse<Marca[]> = await res.json()
+  const json = await api.get<ApiResponse<Marca[]>>('/almacen/marcas')
   if (!json.success) throw new Error(json.error ?? 'Error al cargar marcas')
   return json.data
 }
 
 const createArticulo = async (payload: ArticuloPayload): Promise<ArticuloDetalle> => {
-  const res = await fetch('http://localhost:3001/api/almacen/articulos', {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  })
-  if (!res.ok) throw new Error('Error al crear artículo')
-  const json: ApiResponse<ArticuloDetalle> = await res.json()
+  const json = await api.post<ApiResponse<ArticuloDetalle>>('/almacen/articulos', payload)
   if (!json.success) throw new Error(json.error ?? 'Error al crear artículo')
   return json.data
 }
@@ -88,13 +70,7 @@ const updateArticulo = async (
   id: string,
   payload: ArticuloPayload
 ): Promise<ArticuloDetalle> => {
-  const res = await fetch(`http://localhost:3001/api/almacen/articulos/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
-  })
-  if (!res.ok) throw new Error('Error al actualizar artículo')
-  const json: ApiResponse<ArticuloDetalle> = await res.json()
+  const json = await api.put<ApiResponse<ArticuloDetalle>>(`/almacen/articulos/${id}`, payload)
   if (!json.success) throw new Error(json.error ?? 'Error al actualizar artículo')
   return json.data
 }

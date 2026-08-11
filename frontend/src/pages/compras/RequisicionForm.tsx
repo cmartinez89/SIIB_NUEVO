@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import { api } from '../../lib/api'
 
 interface HeaderFields {
   concepto: string
@@ -32,17 +33,8 @@ function generateId() {
 }
 
 async function createRequisicion(body: CreateRequisicionBody): Promise<ApiResponse> {
-  const token = localStorage.getItem('token')
-  const res = await fetch('http://localhost:3001/api/compras/requisiciones', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(body),
-  })
-  const json: ApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const json = await api.post<ApiResponse>('/compras/requisiciones', body)
+  if (!json.success) throw new Error(json.error ?? 'Error al crear la requisición')
   return json
 }
 

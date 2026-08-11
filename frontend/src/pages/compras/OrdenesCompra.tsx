@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { api } from '../../lib/api'
 
 interface DetalleItem {
   id: number
@@ -57,16 +58,12 @@ function Spinner() {
 }
 
 async function fetchOrdenes(search: string, fechaDesde: string, fechaHasta: string): Promise<ApiResponse> {
-  const token = localStorage.getItem('token')
-  const params = new URLSearchParams({ cotizada: 'true' })
-  if (search)     params.set('search', search)
-  if (fechaDesde) params.set('fechaDesde', fechaDesde)
-  if (fechaHasta) params.set('fechaHasta', fechaHasta)
-  const res = await fetch(`http://localhost:3001/api/compras/requisiciones?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const json: ApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const params: Record<string, string> = { cotizada: 'true' }
+  if (search)     params.search = search
+  if (fechaDesde) params.fechaDesde = fechaDesde
+  if (fechaHasta) params.fechaHasta = fechaHasta
+  const json = await api.get<ApiResponse>('/compras/requisiciones', params)
+  if (!json.success) throw new Error(json.error ?? 'Error al cargar órdenes de compra')
   return json
 }
 

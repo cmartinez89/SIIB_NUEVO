@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
+import { api } from '../../lib/api'
 
 interface Proveedor {
   id: number
@@ -29,38 +30,22 @@ interface ProveedorFormFields {
 }
 
 async function fetchProveedores(search: string): Promise<ApiResponse> {
-  const token = localStorage.getItem('token')
-  const params = new URLSearchParams()
-  if (search) params.set('search', search)
-  const res = await fetch(`http://localhost:3001/api/compras/proveedores?${params.toString()}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  const json: ApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const params: Record<string, string> = {}
+  if (search) params.search = search
+  const json = await api.get<ApiResponse>('/compras/proveedores', params)
+  if (!json.success) throw new Error(json.error ?? 'Error al cargar proveedores')
   return json
 }
 
 async function createProveedor(body: ProveedorFormFields): Promise<SingleApiResponse> {
-  const token = localStorage.getItem('token')
-  const res = await fetch('http://localhost:3001/api/compras/proveedores', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body),
-  })
-  const json: SingleApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const json = await api.post<SingleApiResponse>('/compras/proveedores', body)
+  if (!json.success) throw new Error(json.error ?? 'Error al crear proveedor')
   return json
 }
 
 async function updateProveedor(id: number, body: Partial<ProveedorFormFields>): Promise<SingleApiResponse> {
-  const token = localStorage.getItem('token')
-  const res = await fetch(`http://localhost:3001/api/compras/proveedores/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body),
-  })
-  const json: SingleApiResponse = await res.json()
-  if (!res.ok || !json.success) throw new Error(json.error ?? `Error ${res.status}`)
+  const json = await api.put<SingleApiResponse>(`/compras/proveedores/${id}`, body)
+  if (!json.success) throw new Error(json.error ?? 'Error al actualizar proveedor')
   return json
 }
 
