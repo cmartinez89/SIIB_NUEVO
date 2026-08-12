@@ -23,6 +23,14 @@ interface OrdenCompra {
   detalles: DetalleItem[]
   proveedor?: { nombre: string; rfc: string }
   importeTotal?: number
+  tokenOrden?: string | null
+}
+
+const PORTAL_BASE_URL = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api'
+
+function portalPdfUrl(orden: OrdenCompra): string | null {
+  if (!orden.tokenOrden) return null
+  return `${PORTAL_BASE_URL}/portal/orden-compra/${orden.id}?token=${orden.tokenOrden}`
 }
 
 interface ApiResponse {
@@ -96,14 +104,29 @@ function DetailModal({ orden, onClose }: DetailModalProps) {
             </div>
             <h2 className="text-white font-bold text-lg">{orden.concepto}</h2>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {portalPdfUrl(orden) && (
+              <a
+                href={portalPdfUrl(orden)!}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1" />
+                </svg>
+                Descargar PDF
+              </a>
+            )}
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Metadata */}

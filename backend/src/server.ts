@@ -13,6 +13,9 @@ import usuariosRoutes from "./routes/usuarios";
 import rolesRoutes from "./routes/roles";
 import modulosRoutes from "./routes/modulos";
 import configuracionRoutes from "./routes/configuracion";
+import portalRoutes from "./routes/portal";
+import casetasRoutes from "./routes/casetas";
+import casetaApiRoutes from "./routes/casetaApi";
 import catalogosRoutes from "./routes/catalogos";
 import nominaRoutes from "./routes/nomina";
 import rrhhRoutes from "./routes/rrhh";
@@ -69,6 +72,10 @@ export const buildApp = async () => {
   await app.register(rolesRoutes, { prefix: "/api/roles" });
   await app.register(modulosRoutes, { prefix: "/api/modulos" });
   await app.register(configuracionRoutes, { prefix: "/api/configuracion" });
+  // Sin fastify.authenticate — acceso público por token, como el Portal original.
+  await app.register(portalRoutes, { prefix: "/api/portal" });
+  await app.register(casetasRoutes, { prefix: "/api/casetas" });
+  await app.register(casetaApiRoutes, { prefix: "/api/caseta-api" });
   await app.register(catalogosRoutes, { prefix: "/api/catalogos" });
   await app.register(nominaRoutes, { prefix: "/api/nomina" });
   await app.register(rrhhRoutes, { prefix: "/api/rrhh" });

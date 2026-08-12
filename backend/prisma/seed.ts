@@ -19,6 +19,22 @@ async function main() {
   });
   console.log(`Establo: ${establo.nombre} (id=${establo.id})`);
 
+  // ─── 1b. Empresa (encabezado del PDF del Portal) ─────────────────────────────
+  await prisma.empresa.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      nombre: "Beta Santa Mónica",
+      direccion1: "Dirección de la empresa 123",
+      direccion2: "Colonia, Ciudad, Estado, C.P.",
+      telefono: "555-555-5555",
+      rfc: "XXX000101XXX",
+      linkProveedores: "https://proveedores.beta.com.mx",
+    },
+  });
+  console.log("Empresa: datos de encabezado del Portal configurados");
+
   // ─── 2. Roles ───────────────────────────────────────────────────────────────
   const rolAdmin = await prisma.rol.upsert({
     where: { clave: "ADMIN" },
@@ -133,10 +149,50 @@ async function main() {
       ],
     },
     {
+      nombre: "Caseta",
+      clave: "CASETA",
+      icono: "🚪",
+      orden: 10,
+      submodulos: [
+        { nombre: "Entradas y Salidas", clave: "CASETA_OPERACION", ruta: "/casetas/operacion", orden: 1 },
+        { nombre: "Vales de Salida", clave: "CASETA_VALES", ruta: "/casetas/vales", orden: 2 },
+      ],
+    },
+    {
+      nombre: "Soporte",
+      clave: "SOPORTE",
+      icono: "🎫",
+      orden: 11,
+      submodulos: [
+        { nombre: "Tickets", clave: "TICKETS", ruta: "/soporte/tickets", orden: 1 },
+      ],
+    },
+    {
+      nombre: "Evaluaciones",
+      clave: "EVALUACIONES",
+      icono: "📝",
+      orden: 12,
+      submodulos: [
+        { nombre: "Periodos de Evaluación", clave: "EVALUACIONES_PERIODOS", ruta: "/evaluaciones/periodos", orden: 1 },
+        { nombre: "Departamentos y Rubros", clave: "EVALUACIONES_CONFIG", ruta: "/evaluaciones/configuracion", orden: 2 },
+      ],
+    },
+    {
+      nombre: "Catálogos Menores",
+      clave: "CATALOGOS_MENORES",
+      icono: "🗂️",
+      orden: 13,
+      submodulos: [
+        { nombre: "Clasificaciones", clave: "CLASIFICACIONES", ruta: "/catalogos-menores/clasificaciones", orden: 1 },
+        { nombre: "Centros", clave: "CENTROS", ruta: "/catalogos-menores/centros", orden: 2 },
+        { nombre: "Equipos de Establo", clave: "EQUIPOS_ESTABLO", ruta: "/catalogos-menores/equipos", orden: 3 },
+      ],
+    },
+    {
       nombre: "Administración",
       clave: "ADMINISTRACION",
       icono: "🛠️",
-      orden: 10,
+      orden: 14,
       submodulos: [
         { nombre: "Usuarios", clave: "ADMIN_USUARIOS", ruta: "/administracion/usuarios", orden: 1 },
         { nombre: "Roles y Permisos", clave: "ADMIN_ROLES", ruta: "/administracion/roles", orden: 2 },

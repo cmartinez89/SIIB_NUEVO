@@ -1,4 +1,9 @@
 import { FastifyInstance } from 'fastify'
+import crypto from 'crypto'
+
+function generarTokenOrden(): string {
+  return crypto.randomBytes(19).toString('hex').slice(0, 25)
+}
 
 export default async function comprasRoutes(fastify: FastifyInstance) {
   fastify.addHook('onRequest', fastify.authenticate)
@@ -106,7 +111,7 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
 
       const requisicion = await fastify.prisma.requisicion.findUnique({
         where: { id: parseInt(id, 10) },
-        include: { detalles: true },
+        include: { detalles: true, proveedor: true },
       })
 
       if (!requisicion) {
@@ -129,6 +134,9 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
         concepto?: string
         statusId?: number
         cotizada?: boolean
+        proveedorId?: number | null
+        diasEntrega?: number | null
+        ubicacionEntrega?: string | null
       }
 
       const existing = await fastify.prisma.requisicion.findUnique({
@@ -139,6 +147,11 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
         return reply.status(404).send({ success: false, error: 'Requisición no encontrada' })
       }
 
+      // Al convertir en orden de compra (cotizada=true) se genera el token de
+      // acceso público al PDF del Portal, si aún no tiene uno — equivalente a
+      // AutorizarRequisicionesFinal generando token_orden en el original.
+      const necesitaToken = body.cotizada === true && !existing.tokenOrden
+
       const updated = await fastify.prisma.requisicion.update({
         where: { id: parseInt(id, 10) },
         data: {
@@ -146,8 +159,12 @@ export default async function comprasRoutes(fastify: FastifyInstance) {
           ...(body.concepto !== undefined && { concepto: body.concepto }),
           ...(body.statusId !== undefined && { statusId: body.statusId }),
           ...(body.cotizada !== undefined && { cotizada: body.cotizada }),
+          ...(body.proveedorId !== undefined && { proveedorId: body.proveedorId }),
+          ...(body.diasEntrega !== undefined && { diasEntrega: body.diasEntrega }),
+          ...(body.ubicacionEntrega !== undefined && { ubicacionEntrega: body.ubicacionEntrega }),
+          ...(necesitaToken && { tokenOrden: generarTokenOrden() }),
         },
-        include: { detalles: true },
+        include: { detalles: true, proveedor: true },
       })
 
       return reply.send({ success: true, data: updated })

@@ -29,6 +29,8 @@ model Establo {
   activo          Boolean          @default(true)
   usuarios        Usuario[]
   usuariosAlcance UsuarioEstablo[]
+  casetaLogs      CasetaLog[]
+  valesSalida     ValeSalida[]
 }
 
 // ─── RBAC ───────────────────────────────────────────────────────────────────
@@ -115,6 +117,8 @@ model Empleado {
   puesto          Puesto?       @relation(fields: [puestoId], references: [id])
   departamento    Departamento? @relation(fields: [departamentoId], references: [id])
   nominaDetalles  NominaDetalle[]
+  evaluacionDepartamentos EvaluacionDepartamentoEmpleado[]
+  evaluaciones            EvaluacionEmpleado[]
 }
 
 model Puesto {
@@ -157,34 +161,55 @@ model NominaDetalle {
 }
 
 model Requisicion {
-  id          Int                  @id @default(autoincrement())
-  folio       String?
-  concepto    String?
-  statusId    Int                  @default(1)
-  activo      Boolean              @default(true)
-  cotizada    Boolean              @default(false)
-  aut1Status  String          @default("PENDIENTE")
-  aut2Status  String          @default("PENDIENTE")
-  aut3Status  String          @default("PENDIENTE")
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
-  detalles    RequisicionDetalle[]
+  id               Int                  @id @default(autoincrement())
+  folio            String?
+  concepto         String?
+  statusId         Int                  @default(1)
+  activo           Boolean              @default(true)
+  cotizada         Boolean              @default(false)
+  aut1Status       String               @default("PENDIENTE")
+  aut2Status       String               @default("PENDIENTE")
+  aut3Status       String               @default("PENDIENTE")
+  proveedorId      Int?
+  proveedor        Proveedor?           @relation(fields: [proveedorId], references: [id])
+  tokenOrden       String?              @unique
+  diasEntrega      Int?
+  ubicacionEntrega String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  detalles         RequisicionDetalle[]
 }
 
 model RequisicionDetalle {
-  id             Int         @id @default(autoincrement())
-  requisicionId  Int
-  nombreArticulo String?
-  cantidad       Decimal?    @db.Decimal(10, 2)
-  precio         Decimal?    @db.Decimal(10, 2)
-  requisicion    Requisicion @relation(fields: [requisicionId], references: [id])
+  id                   Int         @id @default(autoincrement())
+  requisicionId        Int
+  nombreArticulo       String?
+  cantidad             Decimal?    @db.Decimal(10, 2)
+  precio               Decimal?    @db.Decimal(10, 2)
+  cuentaContable       String?
+  cuentaContableNombre String?
+  requisicion          Requisicion @relation(fields: [requisicionId], references: [id])
 }
 
 model Proveedor {
-  id     Int     @id @default(autoincrement())
-  nombre String
-  rfc    String?
-  activo Boolean @default(true)
+  id            Int           @id @default(autoincrement())
+  nombre        String
+  rfc           String?
+  activo        Boolean       @default(true)
+  requisiciones Requisicion[]
+}
+
+// ─── Portal: datos de la empresa para el encabezado del PDF de orden ────────
+// Fila única (id=1). Equivalente moderno de C_parametros_configuracion.
+model Empresa {
+  id              Int     @id @default(1)
+  nombre          String  @default("")
+  direccion1      String?
+  direccion2      String?
+  telefono        String?
+  rfc             String?
+  linkProveedores String?
+  logoUrl         String?
 }
 
 model Marca {
@@ -340,4 +365,190 @@ model SolicitudPagoDetalle {
   importe        Decimal?      @db.Decimal(10, 2)
   cuentaContable String?
   solicitud      SolicitudPago @relation(fields: [solicitudId], references: [id])
+}
+
+// ─── Casetas: bitácora de entrada/salida + vales de salida ─────────────────
+// Simplificación deliberada del original: una fila por visita (no tablas hijas
+// separadas por tipo de visita general/báscula/taller) — los campos opcionales
+// de báscula/vale se guardan directo en el log. BuscarInformacionFicha's
+// integración con la base Firebird externa ("SAB") no se replica aquí — ver
+// Fase 3 en el roadmap de migración.
+model CasetaLog {
+  id                Int       @id @default(autoincrement())
+  establoId         Int
+  nombreRegistro    String
+  tipoEntrada       String
+  area              String?
+  placas            String?
+  asunto            String?
+  fechaEntrada      DateTime  @default(now())
+  usuarioEntradaId  Int?
+  fechaSalida       DateTime?
+  tiempoEstanciaSeg Int?
+  usuarioSalidaId   Int?
+  folioVale         String?
+  folioBascula      String?
+  pesoSalida        Decimal?  @db.Decimal(10, 2)
+  observaciones     String?
+  activo            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  establo           Establo   @relation(fields: [establoId], references: [id])
+}
+
+model ValeSalida {
+  id           Int      @id @default(autoincrement())
+  establoId    Int
+  folio        String   @unique
+  area         String?
+  descripcion  String?
+  tipoSalida   String?
+  proveedor    String?
+  nombreActivo String?
+  idActivo     String?
+  registrado   Boolean  @default(false)
+  usuarioId    Int?
+  activo       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  establo      Establo  @relation(fields: [establoId], references: [id])
+}
+
+// ─── Tareas: mesa de ayuda interna tipo Kanban ─────────────────────────────
+model Ticket {
+  id                    Int             @id @default(autoincrement())
+  titulo                String
+  descripcion           String?
+  estado                Int             @default(1) // 1 Abierto 2 Progreso 3 Cerrado 4 Cancelado 5 Espera 6 Reabierto
+  prioridad             String          @default("MEDIA")
+  categoria             String?
+  areaDestino           String?
+  usuarioSolicitaId     Int
+  usuarioAsignadoId     Int?
+  fechaAsignacion       DateTime?
+  fechaPrimeraRespuesta DateTime?
+  fechaCierre           DateTime?
+  usuarioCierraId       Int?
+  reaperturas           Int             @default(0)
+  activo                Boolean         @default(true)
+  createdAt             DateTime        @default(now())
+  mensajes              TicketMensaje[]
+}
+
+model TicketMensaje {
+  id        Int      @id @default(autoincrement())
+  ticketId  Int
+  usuarioId Int
+  mensaje   String
+  esInterno Boolean  @default(false)
+  fecha     DateTime @default(now())
+  activo    Boolean  @default(true)
+  ticket    Ticket   @relation(fields: [ticketId], references: [id])
+}
+
+// ─── Evaluaciones de desempeño ──────────────────────────────────────────────
+// Simplificación deliberada: el original acopla este módulo a Presupuestos
+// (C_presupuestos_anios) y a un sistema de autorización paralelo
+// ("usuarios masters", acción 2008) que no existen en SIIB_NUEVO. Aquí el
+// "año" es un campo plano en EvaluacionPeriodo y la autorización final usa
+// el RBAC de Fase 1 (rol esAdmin) en vez de un usuario master.
+model EvaluacionDepartamento {
+  id        Int                              @id @default(autoincrement())
+  nombre    String
+  activo    Boolean                          @default(true)
+  empleados EvaluacionDepartamentoEmpleado[]
+  rubros    EvaluacionRubro[]
+}
+
+model EvaluacionDepartamentoEmpleado {
+  id             Int                    @id @default(autoincrement())
+  departamentoId Int
+  empleadoId     Int
+  activo         Boolean                @default(true)
+  departamento   EvaluacionDepartamento @relation(fields: [departamentoId], references: [id])
+  empleado       Empleado               @relation(fields: [empleadoId], references: [id])
+
+  @@unique([departamentoId, empleadoId])
+}
+
+model EvaluacionRubro {
+  id             Int                    @id @default(autoincrement())
+  departamentoId Int
+  nombre         String
+  porcentaje     Decimal                @db.Decimal(5, 2)
+  activo         Boolean                @default(true)
+  departamento   EvaluacionDepartamento @relation(fields: [departamentoId], references: [id])
+  conceptos      EvaluacionConcepto[]
+}
+
+model EvaluacionConcepto {
+  id         Int             @id @default(autoincrement())
+  rubroId    Int
+  nombre     String
+  porcentaje Decimal         @db.Decimal(5, 2)
+  activo     Boolean         @default(true)
+  rubro      EvaluacionRubro @relation(fields: [rubroId], references: [id])
+  capturas   EvaluacionConceptoCapturado[]
+}
+
+model EvaluacionPeriodo {
+  id                Int                  @id @default(autoincrement())
+  descripcion       String
+  anio              Int
+  abierta           Boolean              @default(true)
+  fechaApertura     DateTime             @default(now())
+  fechaCierre       DateTime?
+  usuarioRegistraId Int?
+  activo            Boolean              @default(true)
+  evaluaciones      EvaluacionEmpleado[]
+}
+
+model EvaluacionEmpleado {
+  id                Int                            @id @default(autoincrement())
+  periodoId         Int
+  empleadoId        Int
+  departamentoId    Int
+  status            String                         @default("PENDIENTE") // PENDIENTE, CAPTURA, EVALUADA, EXCLUIDA
+  calificacionFinal Decimal?                        @db.Decimal(5, 2)
+  usuarioCalificaId Int?
+  fortalezas        String?
+  areaOportunidad   String?
+  activo            Boolean                        @default(true)
+  periodo           EvaluacionPeriodo              @relation(fields: [periodoId], references: [id])
+  empleado          Empleado                       @relation(fields: [empleadoId], references: [id])
+  conceptos         EvaluacionConceptoCapturado[]
+
+  @@unique([periodoId, empleadoId])
+}
+
+model EvaluacionConceptoCapturado {
+  id                   Int                 @id @default(autoincrement())
+  evaluacionEmpleadoId Int
+  conceptoId           Int
+  calificacion         Decimal             @db.Decimal(5, 2)
+  comentarios          String?
+  evaluacionEmpleado   EvaluacionEmpleado  @relation(fields: [evaluacionEmpleadoId], references: [id])
+  concepto             EvaluacionConcepto  @relation(fields: [conceptoId], references: [id])
+
+  @@unique([evaluacionEmpleadoId, conceptoId])
+}
+
+// ─── Catálogos menores ──────────────────────────────────────────────────────
+model Clasificacion {
+  id     Int     @id @default(autoincrement())
+  nombre String
+  activo Boolean @default(true)
+}
+
+model Centro {
+  id     Int     @id @default(autoincrement())
+  siglas String  @unique
+  nombre String
+  activo Boolean @default(true)
+}
+
+model EquipoEstablo {
+  id            Int     @id @default(autoincrement())
+  nombre        String
+  clave         String  @unique
+  observaciones String?
+  activo        Boolean @default(true)
 }
