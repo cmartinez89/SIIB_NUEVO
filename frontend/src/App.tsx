@@ -60,9 +60,24 @@ import SolicitudesPago from '@/pages/contabilidad/SolicitudesPago'
 import SolicitudPagoForm from '@/pages/contabilidad/SolicitudPagoForm'
 import SolicitudPagoDetalle from '@/pages/contabilidad/SolicitudPagoDetalle'
 
+// Administración
+import UsuariosList from '@/pages/administracion/UsuariosList'
+import RolesList from '@/pages/administracion/RolesList'
+import RolPermisos from '@/pages/administracion/RolPermisos'
+import ModulosAdmin from '@/pages/administracion/ModulosAdmin'
+import ConfiguracionAlcance from '@/pages/administracion/ConfiguracionAlcance'
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+// Oculta/bloquea páginas que el rol del usuario no tiene permiso de ver.
+// Un usuario esAdmin siempre pasa (ver store/auth.ts hasSubmodulo).
+function RequireSubmodulo({ clave, children }: { clave: string; children: React.ReactNode }) {
+  const permitido = useAuthStore((s) => s.hasSubmodulo(clave))
+  if (!permitido) return <Navigate to="/dashboard" replace />
   return <>{children}</>
 }
 
@@ -83,61 +98,68 @@ export default function App() {
 
         {/* Nómina */}
         <Route path="/nomina" element={<NominaIndex />} />
-        <Route path="/nomina/prenomina" element={<PrenominaList />} />
-        <Route path="/nomina/prenomina/:id" element={<PrenominaDetalle />} />
-        <Route path="/nomina/recibos" element={<RecibosNomina />} />
-        <Route path="/nomina/checador" element={<Checador />} />
-        <Route path="/nomina/tef" element={<TEF />} />
+        <Route path="/nomina/prenomina" element={<RequireSubmodulo clave="PRENOMINA"><PrenominaList /></RequireSubmodulo>} />
+        <Route path="/nomina/prenomina/:id" element={<RequireSubmodulo clave="PRENOMINA"><PrenominaDetalle /></RequireSubmodulo>} />
+        <Route path="/nomina/recibos" element={<RequireSubmodulo clave="RECIBOS"><RecibosNomina /></RequireSubmodulo>} />
+        <Route path="/nomina/checador" element={<RequireSubmodulo clave="CHECADOR"><Checador /></RequireSubmodulo>} />
+        <Route path="/nomina/tef" element={<RequireSubmodulo clave="TEF"><TEF /></RequireSubmodulo>} />
 
         {/* RRHH */}
-        <Route path="/rrhh/empleados" element={<EmpleadosList />} />
-        <Route path="/rrhh/empleados/nuevo" element={<EmpleadoForm />} />
-        <Route path="/rrhh/empleados/:id" element={<EmpleadoDetalle />} />
-        <Route path="/rrhh/empleados/:id/editar" element={<EmpleadoForm />} />
+        <Route path="/rrhh/empleados" element={<RequireSubmodulo clave="EMPLEADOS"><EmpleadosList /></RequireSubmodulo>} />
+        <Route path="/rrhh/empleados/nuevo" element={<RequireSubmodulo clave="EMPLEADOS"><EmpleadoForm /></RequireSubmodulo>} />
+        <Route path="/rrhh/empleados/:id" element={<RequireSubmodulo clave="EMPLEADOS"><EmpleadoDetalle /></RequireSubmodulo>} />
+        <Route path="/rrhh/empleados/:id/editar" element={<RequireSubmodulo clave="EMPLEADOS"><EmpleadoForm /></RequireSubmodulo>} />
 
         {/* Compras */}
-        <Route path="/compras/requisiciones" element={<RequisicionesList />} />
-        <Route path="/compras/requisiciones/nueva" element={<RequisicionForm />} />
-        <Route path="/compras/requisiciones/:id" element={<RequisicionDetalle />} />
-        <Route path="/compras/ordenes" element={<OrdenesCompra />} />
-        <Route path="/compras/proveedores" element={<ProveedoresList />} />
+        <Route path="/compras/requisiciones" element={<RequireSubmodulo clave="REQUISICIONES"><RequisicionesList /></RequireSubmodulo>} />
+        <Route path="/compras/requisiciones/nueva" element={<RequireSubmodulo clave="REQUISICIONES"><RequisicionForm /></RequireSubmodulo>} />
+        <Route path="/compras/requisiciones/:id" element={<RequireSubmodulo clave="REQUISICIONES"><RequisicionDetalle /></RequireSubmodulo>} />
+        <Route path="/compras/ordenes" element={<RequireSubmodulo clave="ORDENES_COMPRA"><OrdenesCompra /></RequireSubmodulo>} />
+        <Route path="/compras/proveedores" element={<RequireSubmodulo clave="PROVEEDORES"><ProveedoresList /></RequireSubmodulo>} />
 
         {/* Almacén */}
-        <Route path="/almacen/inventario" element={<InventarioList />} />
-        <Route path="/almacen/articulos/nuevo" element={<ArticuloForm />} />
-        <Route path="/almacen/movimientos" element={<MovimientosList />} />
-        <Route path="/almacen/solicitudes" element={<SolicitudesAlmacen />} />
+        <Route path="/almacen/inventario" element={<RequireSubmodulo clave="INVENTARIO"><InventarioList /></RequireSubmodulo>} />
+        <Route path="/almacen/articulos/nuevo" element={<RequireSubmodulo clave="INVENTARIO"><ArticuloForm /></RequireSubmodulo>} />
+        <Route path="/almacen/movimientos" element={<RequireSubmodulo clave="MOVIMIENTOS_ALMACEN"><MovimientosList /></RequireSubmodulo>} />
+        <Route path="/almacen/solicitudes" element={<RequireSubmodulo clave="SOLICITUDES_ALMACEN"><SolicitudesAlmacen /></RequireSubmodulo>} />
 
         {/* Alimentación */}
-        <Route path="/alimentacion/dietas" element={<DietasList />} />
-        <Route path="/alimentacion/dietas/nueva" element={<DietaForm />} />
-        <Route path="/alimentacion/dietas/:id" element={<DietaDetalle />} />
-        <Route path="/alimentacion/forrajes" element={<FacturasForraje />} />
-        <Route path="/alimentacion/forrajes/nueva" element={<FacturaForrajeForm />} />
+        <Route path="/alimentacion/dietas" element={<RequireSubmodulo clave="DIETAS"><DietasList /></RequireSubmodulo>} />
+        <Route path="/alimentacion/dietas/nueva" element={<RequireSubmodulo clave="DIETAS"><DietaForm /></RequireSubmodulo>} />
+        <Route path="/alimentacion/dietas/:id" element={<RequireSubmodulo clave="DIETAS"><DietaDetalle /></RequireSubmodulo>} />
+        <Route path="/alimentacion/forrajes" element={<RequireSubmodulo clave="FORRAJES"><FacturasForraje /></RequireSubmodulo>} />
+        <Route path="/alimentacion/forrajes/nueva" element={<RequireSubmodulo clave="FORRAJES"><FacturaForrajeForm /></RequireSubmodulo>} />
 
         {/* Informática */}
-        <Route path="/informatica/animales" element={<AnimalesList />} />
-        <Route path="/informatica/animales/nuevo" element={<AnimalForm />} />
-        <Route path="/informatica/animales/:id" element={<AnimalDetalle />} />
-        <Route path="/informatica/lotes" element={<LotesList />} />
-        <Route path="/informatica/partos" element={<PartosList />} />
+        <Route path="/informatica/animales" element={<RequireSubmodulo clave="ANIMALES"><AnimalesList /></RequireSubmodulo>} />
+        <Route path="/informatica/animales/nuevo" element={<RequireSubmodulo clave="ANIMALES"><AnimalForm /></RequireSubmodulo>} />
+        <Route path="/informatica/animales/:id" element={<RequireSubmodulo clave="ANIMALES"><AnimalDetalle /></RequireSubmodulo>} />
+        <Route path="/informatica/lotes" element={<RequireSubmodulo clave="LOTES"><LotesList /></RequireSubmodulo>} />
+        <Route path="/informatica/partos" element={<RequireSubmodulo clave="PARTOS"><PartosList /></RequireSubmodulo>} />
 
         {/* Báscula */}
-        <Route path="/bascula/fichas" element={<FichasBascula />} />
-        <Route path="/bascula/fichas/nueva" element={<FichaBasculaForm />} />
-        <Route path="/bascula/fichas/:id" element={<FichaBasculaDetalle />} />
+        <Route path="/bascula/fichas" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichasBascula /></RequireSubmodulo>} />
+        <Route path="/bascula/fichas/nueva" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichaBasculaForm /></RequireSubmodulo>} />
+        <Route path="/bascula/fichas/:id" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichaBasculaDetalle /></RequireSubmodulo>} />
 
         {/* Leche */}
-        <Route path="/leche" element={<EnviosLeche />} />
-        <Route path="/leche/envios" element={<EnviosLeche />} />
-        <Route path="/leche/nuevo" element={<EnvioLecheForm />} />
-        <Route path="/leche/programacion" element={<ProgramacionSemanal />} />
+        <Route path="/leche" element={<RequireSubmodulo clave="ENVIOS_LECHE"><EnviosLeche /></RequireSubmodulo>} />
+        <Route path="/leche/envios" element={<RequireSubmodulo clave="ENVIOS_LECHE"><EnviosLeche /></RequireSubmodulo>} />
+        <Route path="/leche/nuevo" element={<RequireSubmodulo clave="ENVIOS_LECHE"><EnvioLecheForm /></RequireSubmodulo>} />
+        <Route path="/leche/programacion" element={<RequireSubmodulo clave="PROGRAMACION_LECHE"><ProgramacionSemanal /></RequireSubmodulo>} />
 
         {/* Contabilidad */}
-        <Route path="/contabilidad" element={<SolicitudesPago />} />
-        <Route path="/contabilidad/solicitudes" element={<SolicitudesPago />} />
-        <Route path="/contabilidad/nueva-solicitud" element={<SolicitudPagoForm />} />
-        <Route path="/contabilidad/solicitud/:id" element={<SolicitudPagoDetalle />} />
+        <Route path="/contabilidad" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudesPago /></RequireSubmodulo>} />
+        <Route path="/contabilidad/solicitudes" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudesPago /></RequireSubmodulo>} />
+        <Route path="/contabilidad/nueva-solicitud" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudPagoForm /></RequireSubmodulo>} />
+        <Route path="/contabilidad/solicitud/:id" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudPagoDetalle /></RequireSubmodulo>} />
+
+        {/* Administración */}
+        <Route path="/administracion/usuarios" element={<RequireSubmodulo clave="ADMIN_USUARIOS"><UsuariosList /></RequireSubmodulo>} />
+        <Route path="/administracion/roles" element={<RequireSubmodulo clave="ADMIN_ROLES"><RolesList /></RequireSubmodulo>} />
+        <Route path="/administracion/roles/:id" element={<RequireSubmodulo clave="ADMIN_ROLES"><RolPermisos /></RequireSubmodulo>} />
+        <Route path="/administracion/modulos" element={<RequireSubmodulo clave="ADMIN_MODULOS"><ModulosAdmin /></RequireSubmodulo>} />
+        <Route path="/administracion/configuracion" element={<RequireSubmodulo clave="ADMIN_CONFIGURACION"><ConfiguracionAlcance /></RequireSubmodulo>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

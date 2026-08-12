@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useAuthStore } from '@/store/auth'
-import type { User } from '@/store/auth'
+import type { User, MenuModulo } from '@/store/auth'
 
 interface LoginPayload {
   email: string
@@ -13,6 +13,7 @@ interface LoginPayload {
 interface LoginResponse {
   token: string
   user: User
+  menu: MenuModulo[]
 }
 
 const EyeIcon = ({ open }: { open: boolean }) =>
@@ -60,7 +61,7 @@ export default function Login() {
   const mutation = useMutation<LoginResponse, Error, LoginPayload>({
     mutationFn: (payload) => api.post<LoginResponse>('/auth/login', payload),
     onSuccess(data) {
-      login(data.token, data.user)
+      login(data.token, data.user, data.menu)
       navigate('/dashboard', { replace: true })
     },
   })

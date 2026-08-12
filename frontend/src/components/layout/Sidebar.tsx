@@ -1,117 +1,6 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-
-interface NavItem {
-  label: string
-  to: string
-}
-
-interface NavSection {
-  id: string
-  label: string
-  icon: string
-  items: NavItem[]
-}
-
-const NAV_SECTIONS: NavSection[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: '📊',
-    items: [{ label: 'Dashboard', to: '/dashboard' }],
-  },
-  {
-    id: 'nomina',
-    label: 'Nómina',
-    icon: '💰',
-    items: [
-      { label: 'Pre-Nómina', to: '/nomina/prenomina' },
-      { label: 'Recibos', to: '/nomina/recibos' },
-      { label: 'Checador', to: '/nomina/checador' },
-      { label: 'TEF', to: '/nomina/tef' },
-      { label: 'Vacaciones', to: '/nomina/vacaciones' },
-    ],
-  },
-  {
-    id: 'rrhh',
-    label: 'RR.HH.',
-    icon: '👥',
-    items: [
-      { label: 'Empleados', to: '/rrhh/empleados' },
-      { label: 'Puestos', to: '/rrhh/puestos' },
-      { label: 'Departamentos', to: '/rrhh/departamentos' },
-    ],
-  },
-  {
-    id: 'compras',
-    label: 'Compras',
-    icon: '🛒',
-    items: [
-      { label: 'Requisiciones', to: '/compras/requisiciones' },
-      { label: 'Cotizaciones', to: '/compras/cotizaciones' },
-      { label: 'Órdenes de Compra', to: '/compras/ordenes' },
-      { label: 'Proveedores', to: '/compras/proveedores' },
-    ],
-  },
-  {
-    id: 'almacen',
-    label: 'Almacén',
-    icon: '📦',
-    items: [
-      { label: 'Inventario', to: '/almacen/inventario' },
-      { label: 'Artículos', to: '/almacen/articulos' },
-      { label: 'Movimientos', to: '/almacen/movimientos' },
-      { label: 'Solicitudes', to: '/almacen/solicitudes' },
-    ],
-  },
-  {
-    id: 'alimentacion',
-    label: 'Alimentación',
-    icon: '🌾',
-    items: [
-      { label: 'Dietas', to: '/alimentacion/dietas' },
-      { label: 'Forrajes', to: '/alimentacion/forrajes' },
-      { label: 'Programas', to: '/alimentacion/programas' },
-    ],
-  },
-  {
-    id: 'informatica',
-    label: 'Informática Bovina',
-    icon: '🐄',
-    items: [
-      { label: 'Animales', to: '/informatica/animales' },
-      { label: 'Lotes', to: '/informatica/lotes' },
-      { label: 'Partos', to: '/informatica/partos' },
-    ],
-  },
-  {
-    id: 'bascula',
-    label: 'Báscula',
-    icon: '⚖️',
-    items: [
-      { label: 'Fichas', to: '/bascula/fichas' },
-      { label: 'Movimientos', to: '/bascula/movimientos' },
-    ],
-  },
-  {
-    id: 'leche',
-    label: 'Leche',
-    icon: '🥛',
-    items: [
-      { label: 'Envíos', to: '/leche/envios' },
-      { label: 'Programación', to: '/leche/programacion' },
-    ],
-  },
-  {
-    id: 'contabilidad',
-    label: 'Contabilidad',
-    icon: '📒',
-    items: [
-      { label: 'Solicitudes de Pago', to: '/contabilidad/solicitudes' },
-      { label: 'Presupuestos', to: '/contabilidad/presupuestos' },
-    ],
-  },
-]
+import { useAuthStore } from '@/store/auth'
 
 const ChevronIcon = ({ open }: { open: boolean }) => (
   <svg
@@ -126,11 +15,14 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
 )
 
 export default function Sidebar() {
-  // Default: only dashboard section is expanded
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({ dashboard: true })
+  const menu = useAuthStore((s) => s.menu)
+  const isAdmin = useAuthStore((s) => !!s.user?.rol?.esAdmin)
 
-  function toggle(id: string) {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
+  // Default: only the first section is expanded
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  function toggle(clave: string) {
+    setExpanded((prev) => ({ ...prev, [clave]: !prev[clave] }))
   }
 
   return (
@@ -143,52 +35,49 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 scrollbar-thin">
-        {NAV_SECTIONS.map((section) => {
-          const isOpen = !!expanded[section.id]
-          // Dashboard is a single link, not a collapsible section
-          const isSingle = section.id === 'dashboard'
+        {/* Dashboard: always visible to any authenticated user, not gated by permisos */}
+        <div className="px-3 mb-0.5">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              [
+                'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                isActive ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white',
+              ].join(' ')
+            }
+          >
+            <span className="text-base w-5 text-center">📊</span>
+            <span>Dashboard</span>
+          </NavLink>
+        </div>
 
-          if (isSingle) {
-            return (
-              <div key={section.id} className="px-3 mb-0.5">
-                <NavLink
-                  to={section.items[0].to}
-                  className={({ isActive }) =>
-                    [
-                      'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-300 hover:bg-slate-700 hover:text-white',
-                    ].join(' ')
-                  }
-                >
-                  <span className="text-base w-5 text-center">{section.icon}</span>
-                  <span>{section.label}</span>
-                </NavLink>
-              </div>
-            )
-          }
+        {menu.length === 0 && (
+          <p className="px-6 py-4 text-xs text-slate-500">
+            Tu rol no tiene módulos asignados. Contacta a un administrador.
+          </p>
+        )}
+
+        {menu.map((section) => {
+          const isOpen = expanded[section.clave] ?? false
 
           return (
-            <div key={section.id} className="px-3 mb-0.5">
-              {/* Section header button */}
+            <div key={section.clave} className="px-3 mb-0.5">
               <button
-                onClick={() => toggle(section.id)}
+                onClick={() => toggle(section.clave)}
                 className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors"
                 aria-expanded={isOpen}
               >
-                <span className="text-base w-5 text-center">{section.icon}</span>
-                <span className="flex-1 text-left">{section.label}</span>
+                <span className="text-base w-5 text-center">{section.icono ?? '📁'}</span>
+                <span className="flex-1 text-left">{section.nombre}</span>
                 <ChevronIcon open={isOpen} />
               </button>
 
-              {/* Sub-items */}
               {isOpen && (
                 <ul className="mt-0.5 ml-8 space-y-0.5">
-                  {section.items.map((item) => (
-                    <li key={item.to}>
+                  {section.submodulos.map((item) => (
+                    <li key={item.clave}>
                       <NavLink
-                        to={item.to}
+                        to={item.ruta}
                         className={({ isActive }) =>
                           [
                             'block px-3 py-2 rounded-lg text-sm transition-colors',
@@ -198,7 +87,7 @@ export default function Sidebar() {
                           ].join(' ')
                         }
                       >
-                        {item.label}
+                        {item.nombre}
                       </NavLink>
                     </li>
                   ))}
@@ -211,7 +100,9 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="flex-shrink-0 px-5 py-3 border-t border-slate-700">
-        <p className="text-xs text-slate-500">SIIB v1.0 &copy; 2026</p>
+        <p className="text-xs text-slate-500">
+          SIIB v1.0 &copy; 2026 {isAdmin && <span className="text-slate-600">· admin</span>}
+        </p>
       </div>
     </aside>
   )
