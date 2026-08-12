@@ -49,6 +49,7 @@ import PartosList from '@/pages/informatica/PartosList'
 import FichasBascula from '@/pages/bascula/FichasBascula'
 import FichaBasculaForm from '@/pages/bascula/FichaBasculaForm'
 import FichaBasculaDetalle from '@/pages/bascula/FichaBasculaDetalle'
+import FichasBasculaSab from '@/pages/bascula/FichasBasculaSab'
 
 // Leche
 import EnviosLeche from '@/pages/leche/EnviosLeche'
@@ -153,6 +154,7 @@ export default function App() {
         <Route path="/bascula/fichas" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichasBascula /></RequireSubmodulo>} />
         <Route path="/bascula/fichas/nueva" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichaBasculaForm /></RequireSubmodulo>} />
         <Route path="/bascula/fichas/:id" element={<RequireSubmodulo clave="FICHAS_BASCULA"><FichaBasculaDetalle /></RequireSubmodulo>} />
+        <Route path="/bascula/sab" element={<RequireSubmodulo clave="FICHAS_BASCULA_SAB"><FichasBasculaSab /></RequireSubmodulo>} />
 
         {/* Leche */}
         <Route path="/leche" element={<RequireSubmodulo clave="ENVIOS_LECHE"><EnviosLeche /></RequireSubmodulo>} />

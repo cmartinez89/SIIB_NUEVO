@@ -239,7 +239,13 @@ npx prisma migrate reset   # Borra todo y re-crea desde cero
 
 **Fase 2 (Portal + Casetas) — completada 2026-08-12:** PDF público de orden de compra por token (`pdfkit`), bitácora de caseta + vales de salida + sincronización offline del kiosco. **Pendiente dentro de Fase 2** (investigado, no fabricado): llevar Compras y Nómina a paridad real requiere modelar firmas de usuario con límite de monto, validación contra presupuesto por cuenta contable, y las fórmulas exactas de percepciones/deducciones de nómina (el original tiene al menos 4 subsistemas de nómina — prenómina clásica, un segundo flujo "PlanB" de +4000 líneas, turnos, y archivos bancarios TEF). Esto necesita su propia sesión de investigación línea por línea antes de escribir código — no se adivinó ninguna fórmula financiera o de nómina.
 
-Pendiente: ver el mapa completo de módulos faltantes y las fases 3–5 de la hoja de ruta (Báscula SAB, Tracker, Access, Admin SIIB, Tareas, Evaluaciones, catálogos menores, Reportes).
+**Fase 4 (Access, Admin SIIB, Tareas, Evaluaciones, catálogos menores) — completada 2026-08-12.**
+
+**Fase 3 (Báscula SAB + Tracker) — parcial, por diseño:**
+- ✅ Báscula SAB (`/api/bascula-sab`, `/bascula/sab`): flujo completo primera pesada → segunda pesada → cierre, con edición justificada. El peso se **teclea manualmente** en vez de leerse del puerto serie — el punto de integración está marcado con `TODO(hardware)` en `backend/src/routes/basculaSab.ts`. Para conectar la báscula física real hay dos caminos, ninguno probable sin el hardware en mano: **Web Serial API** (Chrome/Edge únicamente, requiere HTTPS, el navegador pide permiso de puerto serie al usuario) o un **agente local** (un pequeño servicio en la PC de la báscula que lee el puerto serie y expone un endpoint HTTP local que el frontend consulta).
+- ⏸️ **Tracker no se implementó** — es una integración ETL con una base **Firebird** externa del sistema de mezcladoras TMR, en un servidor físico distinto por establo (credenciales en tabla de parámetros del original). No hay forma de escribir esto de forma verificable sin esa base accesible: el driver correcto en Node sería [`node-firebird`](https://www.npmjs.com/package/node-firebird), y la arquitectura sería un job programado (`node-cron` o similar) que se conecta a cada Firebird por establo, lee `DS_BATCH`/`DS_RATION`/`DS_INGREDIENT` desde el último `id` sincronizado, y hace upsert hacia un modelo `ConsumoRacion` (no existe todavía en `schema.prisma`). Implementarlo en falso —contra una base que no existe— sería peor que no implementarlo.
+
+Pendiente: ver el mapa completo de módulos faltantes y la Fase 5 de la hoja de ruta (Reportes, módulo por módulo).
 
 ---
 

@@ -127,6 +127,7 @@ async function main() {
       orden: 7,
       submodulos: [
         { nombre: "Fichas", clave: "FICHAS_BASCULA", ruta: "/bascula/fichas", orden: 1 },
+        { nombre: "Báscula SAB", clave: "FICHAS_BASCULA_SAB", ruta: "/bascula/sab", orden: 2 },
       ],
     },
     {

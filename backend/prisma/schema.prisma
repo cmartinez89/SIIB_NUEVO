@@ -32,6 +32,7 @@ model Establo {
   usuariosAlcance UsuarioEstablo[]
   casetaLogs      CasetaLog[]
   valesSalida     ValeSalida[]
+  fichasBasculaSab FichaBasculaSab[]
 }
 
 // ─── RBAC ───────────────────────────────────────────────────────────────────
@@ -587,4 +588,36 @@ model EquipoTI {
   fechaAsignacion   DateTime?
   activo            Boolean   @default(true)
   createdAt         DateTime  @default(now())
+}
+
+// ─── Báscula SAB: segundo canal de pesaje, independiente de FichaBascula ────
+// Fase 3 — captura manual del peso en vez de lectura de puerto serie. El
+// original lee el peso directo de la báscula física por puerto serie
+// (GetPortsNames/ObtenerPesoBascula); replicarlo requiere Web Serial API (a
+// petición del usuario, disponible solo en Chrome/Edge, requiere HTTPS) o un
+// agente local instalado en la PC de la báscula — ninguno se puede probar
+// sin el hardware real, así que esta versión deja el flujo de negocio
+// (primera pesada → segunda pesada → cierre, con edición justificada)
+// funcional con el peso tecleado, y el punto de integración del puerto
+// serie queda marcado explícitamente abajo para cuando haya hardware.
+model FichaBasculaSab {
+  id                 Int       @id @default(autoincrement())
+  folio              String    @unique
+  establoId          Int
+  transportista       String?
+  placas             String?
+  proveedor          String?
+  producto           String?
+  pesoEntrada        Decimal?  @db.Decimal(10, 2)
+  fechaEntrada       DateTime?
+  usuarioEntradaId   Int?
+  pesoSalida         Decimal?  @db.Decimal(10, 2)
+  fechaSalida        DateTime?
+  usuarioSalidaId    Int?
+  pesoNeto           Decimal?  @db.Decimal(10, 2)
+  estatus            String    @default("ABIERTA") // ABIERTA, CERRADA
+  observacionEdicion String?
+  activo             Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  establo            Establo   @relation(fields: [establoId], references: [id])
 }
