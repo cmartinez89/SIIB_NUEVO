@@ -20,6 +20,7 @@ import tareasRoutes from "./routes/tareas";
 import evaluacionesRoutes from "./routes/evaluaciones";
 import catalogosMenoresRoutes from "./routes/catalogosMenores";
 import basculaSabRoutes from "./routes/basculaSab";
+import reportesRoutes from "./routes/reportes";
 import accessRoutes from "./routes/access";
 import adminSiibRoutes from "./routes/adminSiib";
 import catalogosRoutes from "./routes/catalogos";
@@ -86,6 +87,7 @@ export const buildApp = async () => {
   await app.register(evaluacionesRoutes, { prefix: "/api/evaluaciones" });
   await app.register(catalogosMenoresRoutes, { prefix: "/api/catalogos-menores" });
   await app.register(basculaSabRoutes, { prefix: "/api/bascula-sab" });
+  await app.register(reportesRoutes, { prefix: "/api/reportes" });
   await app.register(accessRoutes, { prefix: "/api/access" });
   await app.register(adminSiibRoutes, { prefix: "/api/admin-siib" });
   await app.register(catalogosRoutes, { prefix: "/api/catalogos" });

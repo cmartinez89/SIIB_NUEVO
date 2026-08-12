@@ -190,10 +190,19 @@ async function main() {
       ],
     },
     {
+      nombre: "Reportes",
+      clave: "REPORTES",
+      icono: "📊",
+      orden: 14,
+      submodulos: [
+        { nombre: "Reportes", clave: "REPORTES_GENERAL", ruta: "/reportes", orden: 1 },
+      ],
+    },
+    {
       nombre: "Administración",
       clave: "ADMINISTRACION",
       icono: "🛠️",
-      orden: 14,
+      orden: 15,
       submodulos: [
         { nombre: "Usuarios", clave: "ADMIN_USUARIOS", ruta: "/administracion/usuarios", orden: 1 },
         { nombre: "Roles y Permisos", clave: "ADMIN_ROLES", ruta: "/administracion/roles", orden: 2 },

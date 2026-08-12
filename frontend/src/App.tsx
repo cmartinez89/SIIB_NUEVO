@@ -70,6 +70,7 @@ import TicketsKanban from '@/pages/soporte/TicketsKanban'
 import EvaluacionesPeriodos from '@/pages/evaluaciones/EvaluacionesPeriodos'
 import EvaluacionesConfig from '@/pages/evaluaciones/EvaluacionesConfig'
 import CatalogosMenores from '@/pages/catalogosMenores/CatalogosMenores'
+import Reportes from '@/pages/reportes/Reportes'
 
 // Administración
 import UsuariosList from '@/pages/administracion/UsuariosList'
@@ -183,6 +184,9 @@ export default function App() {
         <Route path="/catalogos-menores/clasificaciones" element={<RequireSubmodulo clave="CLASIFICACIONES"><CatalogosMenores /></RequireSubmodulo>} />
         <Route path="/catalogos-menores/centros" element={<RequireSubmodulo clave="CENTROS"><CatalogosMenores /></RequireSubmodulo>} />
         <Route path="/catalogos-menores/equipos" element={<RequireSubmodulo clave="EQUIPOS_ESTABLO"><CatalogosMenores /></RequireSubmodulo>} />
+
+        {/* Reportes */}
+        <Route path="/reportes" element={<RequireSubmodulo clave="REPORTES_GENERAL"><Reportes /></RequireSubmodulo>} />
 
         {/* Administración */}
         <Route path="/administracion/usuarios" element={<RequireSubmodulo clave="ADMIN_USUARIOS"><UsuariosList /></RequireSubmodulo>} />
