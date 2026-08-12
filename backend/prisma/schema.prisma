@@ -454,8 +454,9 @@ model EvaluacionDepartamento {
   id        Int                              @id @default(autoincrement())
   nombre    String
   activo    Boolean                          @default(true)
-  empleados EvaluacionDepartamentoEmpleado[]
-  rubros    EvaluacionRubro[]
+  empleados    EvaluacionDepartamentoEmpleado[]
+  rubros       EvaluacionRubro[]
+  evaluaciones EvaluacionEmpleado[]
 }
 
 model EvaluacionDepartamentoEmpleado {
@@ -514,6 +515,7 @@ model EvaluacionEmpleado {
   activo            Boolean                        @default(true)
   periodo           EvaluacionPeriodo              @relation(fields: [periodoId], references: [id])
   empleado          Empleado                       @relation(fields: [empleadoId], references: [id])
+  departamento      EvaluacionDepartamento         @relation(fields: [departamentoId], references: [id])
   conceptos         EvaluacionConceptoCapturado[]
 
   @@unique([periodoId, empleadoId])
