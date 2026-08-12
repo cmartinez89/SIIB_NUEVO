@@ -263,7 +263,7 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
         return reply.status(404).send({ success: false, error: 'Artículo no encontrado' })
       }
 
-      if (tipo === 'SALIDA' && articulo.stockActual < cantidad) {
+      if (tipo === 'SALIDA' && Number(articulo.stockActual ?? 0) < cantidad) {
         return reply
           .status(400)
           .send({ success: false, error: 'Stock insuficiente para realizar la salida' })
@@ -307,8 +307,8 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
       })
 
       const stockBajo = articulos
-        .filter((a) => a.stockActual <= a.stockMinimo)
-        .sort((a, b) => a.stockActual - b.stockActual)
+        .filter((a) => Number(a.stockActual ?? 0) <= Number(a.stockMinimo ?? 0))
+        .sort((a, b) => Number(a.stockActual ?? 0) - Number(b.stockActual ?? 0))
 
       return reply.send({ success: true, data: stockBajo, total: stockBajo.length })
     } catch (error) {
@@ -330,7 +330,9 @@ export default async function almacenRoutes(fastify: FastifyInstance) {
       })
 
       const totalArticulos = todosLosArticulos.length
-      const stockBajo = todosLosArticulos.filter((a) => a.stockActual <= a.stockMinimo).length
+      const stockBajo = todosLosArticulos.filter(
+        (a) => Number(a.stockActual ?? 0) <= Number(a.stockMinimo ?? 0)
+      ).length
 
       const movimientosHoy = await fastify.prisma.inventarioMovimiento.count({
         where: {

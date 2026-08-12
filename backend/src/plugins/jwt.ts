@@ -14,7 +14,13 @@ declare module "fastify" {
       reply: FastifyReply
     ) => Promise<void>;
   }
-  interface FastifyRequest {
+}
+
+// @fastify/jwt already declares FastifyRequest.user — narrow its shape here
+// instead of redeclaring the property (which would conflict).
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    payload: JwtPayload;
     user: JwtPayload;
   }
 }

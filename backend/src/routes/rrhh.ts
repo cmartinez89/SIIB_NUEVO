@@ -116,7 +116,7 @@ const rrhhRoutes: FastifyPluginAsync = async (fastify) => {
           curp,
           nss,
           salarioDiario,
-          fechaIngreso: new Date(fechaIngreso),
+          ...(fechaIngreso !== undefined && { fechaIngreso: new Date(fechaIngreso) }),
           activo: true,
           ...(puestoId !== undefined && { puestoId }),
           ...(departamentoId !== undefined && { departamentoId }),
