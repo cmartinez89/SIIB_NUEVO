@@ -76,6 +76,8 @@ import RolesList from '@/pages/administracion/RolesList'
 import RolPermisos from '@/pages/administracion/RolPermisos'
 import ModulosAdmin from '@/pages/administracion/ModulosAdmin'
 import ConfiguracionAlcance from '@/pages/administracion/ConfiguracionAlcance'
+import DispositivosAcceso from '@/pages/administracion/DispositivosAcceso'
+import EquiposTI from '@/pages/administracion/EquiposTI'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -186,6 +188,8 @@ export default function App() {
         <Route path="/administracion/roles/:id" element={<RequireSubmodulo clave="ADMIN_ROLES"><RolPermisos /></RequireSubmodulo>} />
         <Route path="/administracion/modulos" element={<RequireSubmodulo clave="ADMIN_MODULOS"><ModulosAdmin /></RequireSubmodulo>} />
         <Route path="/administracion/configuracion" element={<RequireSubmodulo clave="ADMIN_CONFIGURACION"><ConfiguracionAlcance /></RequireSubmodulo>} />
+        <Route path="/administracion/dispositivos" element={<RequireSubmodulo clave="ADMIN_ACCESO"><DispositivosAcceso /></RequireSubmodulo>} />
+        <Route path="/administracion/equipos-ti" element={<RequireSubmodulo clave="ADMIN_EQUIPOS_TI"><EquiposTI /></RequireSubmodulo>} />
       </Route>
 
       <Route path="*" element={<Navigate to="/dashboard" replace />} />

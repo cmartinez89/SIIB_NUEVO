@@ -19,6 +19,8 @@ import casetaApiRoutes from "./routes/casetaApi";
 import tareasRoutes from "./routes/tareas";
 import evaluacionesRoutes from "./routes/evaluaciones";
 import catalogosMenoresRoutes from "./routes/catalogosMenores";
+import accessRoutes from "./routes/access";
+import adminSiibRoutes from "./routes/adminSiib";
 import catalogosRoutes from "./routes/catalogos";
 import nominaRoutes from "./routes/nomina";
 import rrhhRoutes from "./routes/rrhh";
@@ -82,6 +84,8 @@ export const buildApp = async () => {
   await app.register(tareasRoutes, { prefix: "/api/tareas" });
   await app.register(evaluacionesRoutes, { prefix: "/api/evaluaciones" });
   await app.register(catalogosMenoresRoutes, { prefix: "/api/catalogos-menores" });
+  await app.register(accessRoutes, { prefix: "/api/access" });
+  await app.register(adminSiibRoutes, { prefix: "/api/admin-siib" });
   await app.register(catalogosRoutes, { prefix: "/api/catalogos" });
   await app.register(nominaRoutes, { prefix: "/api/nomina" });
   await app.register(rrhhRoutes, { prefix: "/api/rrhh" });

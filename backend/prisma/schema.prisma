@@ -18,6 +18,7 @@ model Usuario {
   rolId     Int?
   rol       Rol?             @relation(fields: [rolId], references: [id])
   establos  UsuarioEstablo[]
+  equiposTI EquipoTI[]
   createdAt DateTime         @default(now())
   updatedAt DateTime         @updatedAt
 }
@@ -553,4 +554,37 @@ model EquipoEstablo {
   clave         String  @unique
   observaciones String?
   activo        Boolean @default(true)
+}
+
+// ─── Access: whitelist de dispositivos de campo (tablets báscula/checador) ──
+// Simplificación deliberada del original: es un registro/CRUD del
+// dispositivo autorizado, sin la lógica de comandos remotos ni heartbeats —
+// eso requiere el propio agente en el dispositivo, que no existe todavía.
+model DispositivoAcceso {
+  id              Int       @id @default(autoincrement())
+  nombre          String
+  tipo            String // BASCULA, CHECADOR, CASETA
+  identificador    String   @unique // MAC address o Android ID
+  activo          Boolean   @default(true)
+  ultimoAcceso    DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+// ─── Admin SIIB: inventario de equipo de TI ─────────────────────────────────
+// La otra mitad del original (administración del árbol de módulos) ya la
+// cubre Modulo/SubModulo de Fase 1 — este modelo cubre solo el inventario.
+// No genera PDF de responsiva firmada; el historial de asignación se
+// mantiene en los campos usuarioAsignadoId/fechaAsignacion.
+model EquipoTI {
+  id                Int       @id @default(autoincrement())
+  tipo              String // LAPTOP, DESKTOP, IMPRESORA, TELEFONO, OTRO
+  marca             String?
+  modelo            String?
+  numeroSerie       String?   @unique
+  estatus           String    @default("DISPONIBLE") // DISPONIBLE, ASIGNADO, BAJA
+  usuarioAsignadoId Int?
+  usuarioAsignado   Usuario?  @relation(fields: [usuarioAsignadoId], references: [id])
+  fechaAsignacion   DateTime?
+  activo            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
 }

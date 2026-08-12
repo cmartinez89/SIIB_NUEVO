@@ -198,6 +198,8 @@ async function main() {
         { nombre: "Roles y Permisos", clave: "ADMIN_ROLES", ruta: "/administracion/roles", orden: 2 },
         { nombre: "Módulos del Sistema", clave: "ADMIN_MODULOS", ruta: "/administracion/modulos", orden: 3 },
         { nombre: "Configuración de Alcance", clave: "ADMIN_CONFIGURACION", ruta: "/administracion/configuracion", orden: 4 },
+        { nombre: "Dispositivos de Campo", clave: "ADMIN_ACCESO", ruta: "/administracion/dispositivos", orden: 5 },
+        { nombre: "Equipos de TI", clave: "ADMIN_EQUIPOS_TI", ruta: "/administracion/equipos-ti", orden: 6 },
       ],
     },
   ];
