@@ -64,6 +64,12 @@ import SolicitudPagoDetalle from '@/pages/contabilidad/SolicitudPagoDetalle'
 import CasetaOperacion from '@/pages/casetas/CasetaOperacion'
 import Vales from '@/pages/casetas/Vales'
 
+// Soporte / Evaluaciones / Catálogos menores
+import TicketsKanban from '@/pages/soporte/TicketsKanban'
+import EvaluacionesPeriodos from '@/pages/evaluaciones/EvaluacionesPeriodos'
+import EvaluacionesConfig from '@/pages/evaluaciones/EvaluacionesConfig'
+import CatalogosMenores from '@/pages/catalogosMenores/CatalogosMenores'
+
 // Administración
 import UsuariosList from '@/pages/administracion/UsuariosList'
 import RolesList from '@/pages/administracion/RolesList'
@@ -161,6 +167,18 @@ export default function App() {
         {/* Caseta */}
         <Route path="/casetas/operacion" element={<RequireSubmodulo clave="CASETA_OPERACION"><CasetaOperacion /></RequireSubmodulo>} />
         <Route path="/casetas/vales" element={<RequireSubmodulo clave="CASETA_VALES"><Vales /></RequireSubmodulo>} />
+
+        {/* Soporte */}
+        <Route path="/soporte/tickets" element={<RequireSubmodulo clave="TICKETS"><TicketsKanban /></RequireSubmodulo>} />
+
+        {/* Evaluaciones */}
+        <Route path="/evaluaciones/periodos" element={<RequireSubmodulo clave="EVALUACIONES_PERIODOS"><EvaluacionesPeriodos /></RequireSubmodulo>} />
+        <Route path="/evaluaciones/configuracion" element={<RequireSubmodulo clave="EVALUACIONES_CONFIG"><EvaluacionesConfig /></RequireSubmodulo>} />
+
+        {/* Catálogos menores */}
+        <Route path="/catalogos-menores/clasificaciones" element={<RequireSubmodulo clave="CLASIFICACIONES"><CatalogosMenores /></RequireSubmodulo>} />
+        <Route path="/catalogos-menores/centros" element={<RequireSubmodulo clave="CENTROS"><CatalogosMenores /></RequireSubmodulo>} />
+        <Route path="/catalogos-menores/equipos" element={<RequireSubmodulo clave="EQUIPOS_ESTABLO"><CatalogosMenores /></RequireSubmodulo>} />
 
         {/* Administración */}
         <Route path="/administracion/usuarios" element={<RequireSubmodulo clave="ADMIN_USUARIOS"><UsuariosList /></RequireSubmodulo>} />
