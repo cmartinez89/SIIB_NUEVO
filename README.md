@@ -235,7 +235,11 @@ npx prisma migrate reset   # Borra todo y re-crea desde cero
 - ✅ Corregido el patrón de fetch con token/URL hardcodeados: además de `RequisicionesList.tsx` (ya corregido antes), se encontró y corrigió el mismo bug en **8 páginas más** (`ProveedoresList`, `OrdenesCompra`, `RequisicionForm`, `RequisicionDetalle`, `SolicitudesAlmacen`, `InventarioList`, `MovimientosList`, `ArticuloForm`) — todas usaban `localStorage.getItem('token')` (key incorrecta) y `fetch('http://localhost:3001/...')` hardcodeado en vez del cliente `lib/api.ts`.
 - ✅ Verificado: `aut1/2/3Status` y `NominaGrupo.status` ya eran `String` en `schema.prisma` (el mismatch de tipos documentado en versiones anteriores ya no aplica).
 
-Pendiente: ver el mapa completo de módulos faltantes y las fases 1–5 de la hoja de ruta (RBAC, Configuración multi-establo, Portal, Casetas, Báscula SAB, Reportes, etc.).
+**Fase 1 (RBAC) — completada 2026-08-12:** modelos `Rol`/`Modulo`/`SubModulo`/`RolSubModulo`/`UsuarioEstablo`, menú dinámico por rol en login/`/me`, sidebar y rutas del frontend gateadas por permiso real, panel de administración (`/administracion/*`) para roles, módulos y alcance multi-establo. Nota de alcance: la enforcement es a nivel de menú/frontend; las rutas de negocio existentes (compras.ts, nomina.ts, etc.) todavía no verifican permiso por acción — ver el commit de Fase 1 para el detalle.
+
+**Fase 2 (Portal + Casetas) — completada 2026-08-12:** PDF público de orden de compra por token (`pdfkit`), bitácora de caseta + vales de salida + sincronización offline del kiosco. **Pendiente dentro de Fase 2** (investigado, no fabricado): llevar Compras y Nómina a paridad real requiere modelar firmas de usuario con límite de monto, validación contra presupuesto por cuenta contable, y las fórmulas exactas de percepciones/deducciones de nómina (el original tiene al menos 4 subsistemas de nómina — prenómina clásica, un segundo flujo "PlanB" de +4000 líneas, turnos, y archivos bancarios TEF). Esto necesita su propia sesión de investigación línea por línea antes de escribir código — no se adivinó ninguna fórmula financiera o de nómina.
+
+Pendiente: ver el mapa completo de módulos faltantes y las fases 3–5 de la hoja de ruta (Báscula SAB, Tracker, Access, Admin SIIB, Tareas, Evaluaciones, catálogos menores, Reportes).
 
 ---
 
