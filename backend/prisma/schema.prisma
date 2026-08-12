@@ -8,23 +8,91 @@ datasource db {
 }
 
 model Usuario {
-  id        Int      @id @default(autoincrement())
+  id        Int              @id @default(autoincrement())
   nombre    String
-  email     String   @unique
+  email     String           @unique
   password  String
-  activo    Boolean  @default(true)
+  activo    Boolean          @default(true)
   establoId Int?
-  establo   Establo? @relation(fields: [establoId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  establo   Establo?         @relation(fields: [establoId], references: [id])
+  rolId     Int?
+  rol       Rol?             @relation(fields: [rolId], references: [id])
+  establos  UsuarioEstablo[]
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
 }
 
 model Establo {
-  id       Int       @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
+  nombre          String
+  clave           String           @unique
+  activo          Boolean          @default(true)
+  usuarios        Usuario[]
+  usuariosAlcance UsuarioEstablo[]
+}
+
+// ─── RBAC ───────────────────────────────────────────────────────────────────
+// Fase 1: rol-based access. A user has one Rol; a Rol is granted visibility
+// on a set of SubModulo (mapped 1:1 to sidebar nav items). esAdmin bypasses
+// all checks. Multi-establo data scoping (UsuarioEstablo) is separate from
+// menu visibility (RolSubModulo) — a user can see the "Báscula" submodulo
+// but only for the establos they're assigned to.
+
+model Rol {
+  id        Int            @id @default(autoincrement())
+  nombre    String         @unique
+  clave     String         @unique
+  esAdmin   Boolean        @default(false)
+  activo    Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  usuarios  Usuario[]
+  permisos  RolSubModulo[]
+}
+
+model Modulo {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  clave      String      @unique
+  icono      String?
+  orden      Int         @default(0)
+  activo     Boolean     @default(true)
+  submodulos SubModulo[]
+}
+
+model SubModulo {
+  id       Int            @id @default(autoincrement())
+  moduloId Int
   nombre   String
-  clave    String    @unique
-  activo   Boolean   @default(true)
-  usuarios Usuario[]
+  clave    String         @unique
+  ruta     String
+  orden    Int            @default(0)
+  activo   Boolean        @default(true)
+  modulo   Modulo         @relation(fields: [moduloId], references: [id])
+  roles    RolSubModulo[]
+}
+
+model RolSubModulo {
+  id            Int       @id @default(autoincrement())
+  rolId         Int
+  subModuloId   Int
+  puedeVer      Boolean   @default(true)
+  puedeCrear    Boolean   @default(false)
+  puedeEditar   Boolean   @default(false)
+  puedeEliminar Boolean   @default(false)
+  rol           Rol       @relation(fields: [rolId], references: [id])
+  subModulo     SubModulo @relation(fields: [subModuloId], references: [id])
+
+  @@unique([rolId, subModuloId])
+}
+
+model UsuarioEstablo {
+  id        Int     @id @default(autoincrement())
+  usuarioId Int
+  establoId Int
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  establo   Establo @relation(fields: [establoId], references: [id])
+
+  @@unique([usuarioId, establoId])
 }
 
 model Empleado {

@@ -93,9 +93,10 @@ const dashboardRoutes: FastifyPluginAsync = async (fastify) => {
       } catch { /* table may not exist */ }
 
       try {
-        ordenesAbiertas = await prisma.ordenCompra?.count?.({
-          where: { activo: true },
-        }) ?? 0
+        // No hay modelo OrdenCompra separado: una requisición cotizada ES la orden de compra
+        ordenesAbiertas = await prisma.requisicion.count({
+          where: { activo: true, cotizada: true },
+        })
       } catch { /* table may not exist */ }
 
       try {

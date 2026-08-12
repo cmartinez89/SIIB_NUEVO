@@ -20,24 +20,6 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
             password: { type: "string", minLength: 1 },
           },
         },
-        response: {
-          200: {
-            type: "object",
-            properties: {
-              token: { type: "string" },
-              user: {
-                type: "object",
-                properties: {
-                  id: { type: "number" },
-                  nombre: { type: "string" },
-                  email: { type: "string" },
-                  activo: { type: "boolean" },
-                  establoId: { type: ["number", "null"] },
-                },
-              },
-            },
-          },
-        },
       },
     },
     async (request, reply) => {
@@ -45,7 +27,7 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
 
       const usuario = await fastify.prisma.usuario.findUnique({
         where: { email },
-        include: { establo: true },
+        include: { establo: true, rol: true },
       });
 
       if (!usuario) {
@@ -76,6 +58,8 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         nombre: usuario.nombre,
       });
 
+      const { rol, menu } = await fastify.getMenu(usuario.id);
+
       return reply.status(200).send({
         token,
         user: {
@@ -85,7 +69,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
           activo: usuario.activo,
           establoId: usuario.establoId,
           establo: usuario.establo,
+          rol,
         },
+        menu,
       });
     }
   );
@@ -120,22 +106,6 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
     "/me",
     {
       onRequest: [fastify.authenticate],
-      schema: {
-        response: {
-          200: {
-            type: "object",
-            properties: {
-              id: { type: "number" },
-              nombre: { type: "string" },
-              email: { type: "string" },
-              activo: { type: "boolean" },
-              establoId: { type: ["number", "null"] },
-              createdAt: { type: "string" },
-              updatedAt: { type: "string" },
-            },
-          },
-        },
-      },
     },
     async (request, reply) => {
       const { id } = request.user;
@@ -168,7 +138,9 @@ const authRoutes: FastifyPluginAsync = async (fastify) => {
         });
       }
 
-      return reply.status(200).send(usuario);
+      const { rol, menu } = await fastify.getMenu(usuario.id);
+
+      return reply.status(200).send({ ...usuario, rol, menu });
     }
   );
 };

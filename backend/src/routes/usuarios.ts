@@ -7,6 +7,7 @@ interface CreateUsuarioBody {
   password: string;
   activo?: boolean;
   establoId?: number | null;
+  rolId?: number | null;
 }
 
 interface UpdateUsuarioBody {
@@ -15,6 +16,7 @@ interface UpdateUsuarioBody {
   password?: string;
   activo?: boolean;
   establoId?: number | null;
+  rolId?: number | null;
 }
 
 interface IdParams {
@@ -34,9 +36,11 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
         email: true,
         activo: true,
         establoId: true,
+        rolId: true,
         createdAt: true,
         updatedAt: true,
         establo: { select: { id: true, nombre: true, clave: true } },
+        rol: { select: { id: true, nombre: true, clave: true, esAdmin: true } },
       },
       orderBy: { nombre: "asc" },
     });
@@ -60,9 +64,11 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
         email: true,
         activo: true,
         establoId: true,
+        rolId: true,
         createdAt: true,
         updatedAt: true,
         establo: { select: { id: true, nombre: true, clave: true } },
+        rol: { select: { id: true, nombre: true, clave: true, esAdmin: true } },
       },
     });
 
@@ -88,12 +94,13 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
             password: { type: "string", minLength: 6 },
             activo: { type: "boolean" },
             establoId: { type: ["number", "null"] },
+            rolId: { type: ["number", "null"] },
           },
         },
       },
     },
     async (request, reply) => {
-      const { nombre, email, password, activo = true, establoId = null } = request.body;
+      const { nombre, email, password, activo = true, establoId = null, rolId = null } = request.body;
 
       const existing = await fastify.prisma.usuario.findUnique({ where: { email } });
       if (existing) {
@@ -112,6 +119,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
           password: hashedPassword,
           activo,
           establoId,
+          rolId,
         },
         select: {
           id: true,
@@ -119,6 +127,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
           email: true,
           activo: true,
           establoId: true,
+          rolId: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -142,6 +151,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
             password: { type: "string", minLength: 6 },
             activo: { type: "boolean" },
             establoId: { type: ["number", "null"] },
+            rolId: { type: ["number", "null"] },
           },
         },
       },
@@ -158,7 +168,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ error: "Not Found", message: "Usuario no encontrado" });
       }
 
-      const { nombre, email, password, activo, establoId } = request.body;
+      const { nombre, email, password, activo, establoId, rolId } = request.body;
 
       // Check email uniqueness if changing email
       if (email && email !== existing.email) {
@@ -176,6 +186,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
       if (email !== undefined) updateData.email = email;
       if (activo !== undefined) updateData.activo = activo;
       if (establoId !== undefined) updateData.establoId = establoId;
+      if (rolId !== undefined) updateData.rolId = rolId;
       if (password !== undefined) {
         updateData.password = await bcrypt.hash(password, 12);
       }
@@ -189,6 +200,7 @@ const usuariosRoutes: FastifyPluginAsync = async (fastify) => {
           email: true,
           activo: true,
           establoId: true,
+          rolId: true,
           createdAt: true,
           updatedAt: true,
         },

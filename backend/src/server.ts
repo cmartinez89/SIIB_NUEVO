@@ -6,9 +6,13 @@ import jwtPlugin from "@fastify/jwt";
 
 import prismaPlugin from "./plugins/prisma";
 import jwtAuthPlugin from "./plugins/jwt";
+import rbacPlugin from "./plugins/rbac";
 
 import authRoutes from "./routes/auth";
 import usuariosRoutes from "./routes/usuarios";
+import rolesRoutes from "./routes/roles";
+import modulosRoutes from "./routes/modulos";
+import configuracionRoutes from "./routes/configuracion";
 import catalogosRoutes from "./routes/catalogos";
 import nominaRoutes from "./routes/nomina";
 import rrhhRoutes from "./routes/rrhh";
@@ -57,10 +61,14 @@ export const buildApp = async () => {
   // ─── Plugins ────────────────────────────────────────────────────────────────
   await app.register(prismaPlugin);
   await app.register(jwtAuthPlugin);
+  await app.register(rbacPlugin);
 
   // ─── Routes ─────────────────────────────────────────────────────────────────
   await app.register(authRoutes, { prefix: "/api/auth" });
   await app.register(usuariosRoutes, { prefix: "/api/usuarios" });
+  await app.register(rolesRoutes, { prefix: "/api/roles" });
+  await app.register(modulosRoutes, { prefix: "/api/modulos" });
+  await app.register(configuracionRoutes, { prefix: "/api/configuracion" });
   await app.register(catalogosRoutes, { prefix: "/api/catalogos" });
   await app.register(nominaRoutes, { prefix: "/api/nomina" });
   await app.register(rrhhRoutes, { prefix: "/api/rrhh" });
@@ -113,7 +121,7 @@ export const buildApp = async () => {
           generatedAt: new Date().toISOString(),
         };
       } catch (error) {
-        reply.status(500).send({ error: "Error fetching stats" });
+        return reply.status(500).send({ error: "Error fetching stats" });
       }
     }
   );
