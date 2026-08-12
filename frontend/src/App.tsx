@@ -60,6 +60,10 @@ import SolicitudesPago from '@/pages/contabilidad/SolicitudesPago'
 import SolicitudPagoForm from '@/pages/contabilidad/SolicitudPagoForm'
 import SolicitudPagoDetalle from '@/pages/contabilidad/SolicitudPagoDetalle'
 
+// Caseta
+import CasetaOperacion from '@/pages/casetas/CasetaOperacion'
+import Vales from '@/pages/casetas/Vales'
+
 // Administración
 import UsuariosList from '@/pages/administracion/UsuariosList'
 import RolesList from '@/pages/administracion/RolesList'
@@ -153,6 +157,10 @@ export default function App() {
         <Route path="/contabilidad/solicitudes" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudesPago /></RequireSubmodulo>} />
         <Route path="/contabilidad/nueva-solicitud" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudPagoForm /></RequireSubmodulo>} />
         <Route path="/contabilidad/solicitud/:id" element={<RequireSubmodulo clave="SOLICITUDES_PAGO"><SolicitudPagoDetalle /></RequireSubmodulo>} />
+
+        {/* Caseta */}
+        <Route path="/casetas/operacion" element={<RequireSubmodulo clave="CASETA_OPERACION"><CasetaOperacion /></RequireSubmodulo>} />
+        <Route path="/casetas/vales" element={<RequireSubmodulo clave="CASETA_VALES"><Vales /></RequireSubmodulo>} />
 
         {/* Administración */}
         <Route path="/administracion/usuarios" element={<RequireSubmodulo clave="ADMIN_USUARIOS"><UsuariosList /></RequireSubmodulo>} />
