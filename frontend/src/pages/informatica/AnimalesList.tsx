@@ -3,6 +3,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface Animal {
   id: number
   arete: string
@@ -69,17 +75,17 @@ export default function AnimalesList() {
 
   const { data: animalesRes, isLoading: loadingAnimales, error: errorAnimales } = useQuery({
     queryKey: ['animales'],
-    queryFn: () => api.get<Animal[]>('/informatica/animales'),
+    queryFn: () => api.get<ApiResponse<Animal[]>>('/informatica/animales'),
   })
 
   const { data: resumenRes } = useQuery({
     queryKey: ['resumen'],
-    queryFn: () => api.get<Resumen>('/informatica/resumen'),
+    queryFn: () => api.get<ApiResponse<Resumen>>('/informatica/resumen'),
   })
 
   const { data: lotesRes } = useQuery({
     queryKey: ['lotes'],
-    queryFn: () => api.get<Lote[]>('/informatica/lotes'),
+    queryFn: () => api.get<ApiResponse<Lote[]>>('/informatica/lotes'),
   })
 
   const animales = animalesRes?.data ?? []

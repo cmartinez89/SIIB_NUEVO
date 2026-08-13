@@ -3,6 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface Parto {
   id: number
   animalId: number
@@ -66,13 +72,13 @@ export default function AnimalDetalle() {
 
   const { data: animalRes, isLoading, error } = useQuery({
     queryKey: ['animal', id],
-    queryFn: () => api.get<Animal>(`/informatica/animales/${id}`),
+    queryFn: () => api.get<ApiResponse<Animal>>(`/informatica/animales/${id}`),
     enabled: !!id,
   })
 
   const partoMutation = useMutation({
     mutationFn: (data: PartoFormData) =>
-      api.post('/informatica/partos', {
+      api.post<ApiResponse<Parto>>('/informatica/partos', {
         animalId: Number(id),
         fechaParto: data.fechaParto,
         tipoParto: data.tipoParto,

@@ -24,7 +24,7 @@ interface TEFResponse {
 export default function TEF() {
   const { data, isLoading, error } = useQuery<TEFResponse>({
     queryKey: ['tef'],
-    queryFn: () => api('/nomina/tef'),
+    queryFn: () => api.get<TEFResponse>('/nomina/tef'),
   })
 
   const rows = data?.data ?? []

@@ -39,13 +39,13 @@ export default function PartosList() {
 
   const { data, isLoading } = useQuery<PartosResponse>({
     queryKey: ['partos', fechaDesde, fechaHasta],
-    queryFn: () => api(`/informatica/partos?${params}`),
+    queryFn: () => api.get<PartosResponse>(`/informatica/partos?${params}`),
   })
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<PartoForm>()
 
   const mutation = useMutation({
-    mutationFn: (body: PartoForm) => api('/informatica/partos', { method: 'POST', body }),
+    mutationFn: (body: PartoForm) => api.post<PartosResponse>('/informatica/partos', body),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['partos'] }); reset(); setShowModal(false) },
   })
 

@@ -1,7 +1,12 @@
-import React from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams, Link } from 'react-router-dom'
 import { api } from '../../lib/api'
+
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
 
 interface DietaDetalle {
   id: number
@@ -69,7 +74,7 @@ export default function DietaDetalleView() {
     error,
   } = useQuery({
     queryKey: ['dieta', id],
-    queryFn: () => api.get<Dieta>(`/alimentacion/dietas/${id}`),
+    queryFn: () => api.get<ApiResponse<Dieta>>(`/alimentacion/dietas/${id}`),
     enabled: id !== undefined,
   })
 
@@ -84,7 +89,7 @@ export default function DietaDetalleView() {
         fechaFin: dieta.fechaFin,
         detalles: dieta.detalles.map(({ id: _id, ...rest }) => rest),
       }
-      return api.post<Dieta>('/alimentacion/dietas', payload)
+      return api.post<ApiResponse<Dieta>>('/alimentacion/dietas', payload)
     },
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['dietas'] })

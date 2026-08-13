@@ -24,7 +24,7 @@ export default function EnvioLecheForm() {
 
   const mutation = useMutation({
     mutationFn: (body: EnvioLecheFormData) =>
-      api('/leche/envios', { method: 'POST', body: { ...body, importe } }),
+      api.post('/leche/envios', { ...body, importe }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['envios-leche'] })
       navigate('/leche')

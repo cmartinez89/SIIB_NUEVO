@@ -3,6 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface Lote {
   id: number
   nombre: string
@@ -25,13 +31,13 @@ export default function LotesList() {
 
   const { data: lotesRes, isLoading, error } = useQuery({
     queryKey: ['lotes'],
-    queryFn: () => api.get<Lote[]>('/informatica/lotes'),
+    queryFn: () => api.get<ApiResponse<Lote[]>>('/informatica/lotes'),
   })
 
   const lotes = lotesRes?.data ?? []
 
   const createMutation = useMutation({
-    mutationFn: () => api.post('/informatica/lotes', { nombre: createNombre.trim() }),
+    mutationFn: () => api.post<ApiResponse<Lote>>('/informatica/lotes', { nombre: createNombre.trim() }),
     onSuccess: (res) => {
       if (!res.success) { setCreateError(res.error ?? 'Error al crear lote'); return }
       queryClient.invalidateQueries({ queryKey: ['lotes'] })
@@ -43,7 +49,7 @@ export default function LotesList() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: () => api.put(`/informatica/lotes/${editModal!.id}`, { nombre: editNombre.trim() }),
+    mutationFn: () => api.put<ApiResponse<Lote>>(`/informatica/lotes/${editModal!.id}`, { nombre: editNombre.trim() }),
     onSuccess: (res) => {
       if (!res.success) { setEditError(res.error ?? 'Error al actualizar lote'); return }
       queryClient.invalidateQueries({ queryKey: ['lotes'] })
@@ -55,7 +61,7 @@ export default function LotesList() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => api.delete(`/informatica/lotes/${id}`),
+    mutationFn: (id: number) => api.delete<ApiResponse<null>>(`/informatica/lotes/${id}`),
     onSuccess: (res) => {
       if (!res.success) { setDeleteError(res.error ?? 'No se puede eliminar el lote'); return }
       setDeleteError('')

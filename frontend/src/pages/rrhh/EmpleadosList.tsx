@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Button from '../../components/ui/Button'
@@ -6,7 +6,7 @@ import Input from '../../components/ui/Input'
 import Select from '../../components/ui/Select'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
-import Table, { TableColumn } from '../../components/ui/Table'
+import Table, { Column } from '../../components/ui/Table'
 import { api } from '../../lib/api'
 
 interface Puesto {
@@ -76,7 +76,7 @@ export default function EmpleadosList() {
 
   const { data: departamentosRes } = useQuery<ApiResponse<Departamento[]>>({
     queryKey: ['departamentos'],
-    queryFn: () => api.get('/api/rrhh/departamentos').then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Departamento[]>>('/rrhh/departamentos'),
   })
   const departamentos = departamentosRes?.data ?? []
 
@@ -94,7 +94,7 @@ export default function EmpleadosList() {
     isFetching,
   } = useQuery<ApiResponse<Empleado[]>>({
     queryKey: ['empleados', debouncedSearch, departamentoFilter, activoFilter, page],
-    queryFn: () => api.get(`/api/rrhh/empleados?${queryParams.toString()}`).then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Empleado[]>>(`/rrhh/empleados?${queryParams.toString()}`),
     placeholderData: (prev) => prev,
   })
 
@@ -105,8 +105,8 @@ export default function EmpleadosList() {
   const toggleActivoMutation = useMutation({
     mutationFn: ({ id, activo }: { id: number; activo: boolean }) =>
       activo
-        ? api.delete(`/api/rrhh/empleados/${id}`).then((r) => r.data)
-        : api.patch(`/api/rrhh/empleados/${id}/restore`).then((r) => r.data),
+        ? api.delete<ApiResponse<null>>(`/rrhh/empleados/${id}`).then((r) => r.data)
+        : api.patch<ApiResponse<null>>(`/rrhh/empleados/${id}/restore`).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['empleados'] })
     },
@@ -120,11 +120,11 @@ export default function EmpleadosList() {
   const formatMXN = (value: number) =>
     new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(value)
 
-  const columns: TableColumn<Empleado>[] = [
+  const columns: Column<Empleado>[] = [
     {
       key: 'noEmpleado',
       header: 'No. Empleado',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="font-mono text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
           {row.noEmpleado}
         </span>
@@ -133,7 +133,7 @@ export default function EmpleadosList() {
     {
       key: 'nombre',
       header: 'Nombre Completo',
-      render: (_v, row) => (
+      render: (row) => (
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
             {row.nombre.charAt(0)}
@@ -148,35 +148,35 @@ export default function EmpleadosList() {
     {
       key: 'puesto',
       header: 'Puesto',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="text-gray-600">{row.puesto?.nombre ?? '—'}</span>
       ),
     },
     {
       key: 'departamento',
       header: 'Departamento',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="text-gray-600">{row.departamento?.nombre ?? '—'}</span>
       ),
     },
     {
       key: 'salarioDiario',
       header: 'Salario Diario',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="font-medium text-gray-800">{formatMXN(row.salarioDiario)}</span>
       ),
     },
     {
       key: 'salarioMensual',
       header: 'Salario Mensual',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="font-semibold text-green-700">{formatMXN(row.salarioDiario * 30)}</span>
       ),
     },
     {
       key: 'activo',
       header: 'Estatus',
-      render: (_v, row) => (
+      render: (row) => (
         <Badge variant={row.activo ? 'success' : 'danger'}>
           {row.activo ? 'Activo' : 'Inactivo'}
         </Badge>
@@ -185,7 +185,7 @@ export default function EmpleadosList() {
     {
       key: 'id',
       header: 'Acciones',
-      render: (_v, row) => (
+      render: (row) => (
         <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"

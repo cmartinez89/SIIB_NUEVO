@@ -29,16 +29,16 @@ export default function SolicitudPagoDetalle() {
 
   const { data, isLoading } = useQuery<{ success: boolean; data: SolicitudDetalle }>({
     queryKey: ['solicitud-pago', id],
-    queryFn: () => api(`/contabilidad/solicitudes/${id}`),
+    queryFn: () => api.get<{ success: boolean; data: SolicitudDetalle }>(`/contabilidad/solicitudes/${id}`),
   })
 
   const aprobar = useMutation({
-    mutationFn: () => api(`/contabilidad/solicitudes/${id}/autorizar`, { method: 'POST' }),
+    mutationFn: () => api.post(`/contabilidad/solicitudes/${id}/autorizar`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['solicitud-pago', id] }),
   })
 
   const pagar = useMutation({
-    mutationFn: () => api(`/contabilidad/solicitudes/${id}/pagar`, { method: 'POST' }),
+    mutationFn: () => api.post(`/contabilidad/solicitudes/${id}/pagar`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['solicitud-pago', id] }),
   })
 

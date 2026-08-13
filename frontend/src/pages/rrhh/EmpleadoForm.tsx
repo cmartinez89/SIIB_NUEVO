@@ -90,7 +90,7 @@ export default function EmpleadoForm() {
 
   const { isLoading: loadingEmpleado } = useQuery<ApiResponse<Empleado>>({
     queryKey: ['empleado', id],
-    queryFn: () => api.get(`/api/rrhh/empleados/${id}`).then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Empleado>>(`/rrhh/empleados/${id}`),
     enabled: isEdit,
     gcTime: 0,
     // populate form once data arrives
@@ -114,13 +114,13 @@ export default function EmpleadoForm() {
 
   const { data: puestosRes } = useQuery<ApiResponse<Puesto[]>>({
     queryKey: ['puestos'],
-    queryFn: () => api.get('/api/rrhh/puestos').then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Puesto[]>>('/rrhh/puestos'),
   })
   const puestos = puestosRes?.data ?? []
 
   const { data: departamentosRes } = useQuery<ApiResponse<Departamento[]>>({
     queryKey: ['departamentos'],
-    queryFn: () => api.get('/api/rrhh/departamentos').then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Departamento[]>>('/rrhh/departamentos'),
   })
   const departamentos = departamentosRes?.data ?? []
 
@@ -128,7 +128,7 @@ export default function EmpleadoForm() {
 
   const createMutation = useMutation({
     mutationFn: (data: Omit<EmpleadoFormValues, 'puestoId' | 'departamentoId' | 'salarioDiario'> & { puestoId?: number; departamentoId?: number; salarioDiario: number }) =>
-      api.post('/api/rrhh/empleados', data).then((r) => r.data),
+      api.post<ApiResponse<Empleado>>('/rrhh/empleados', data).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['empleados'] })
       navigate('/rrhh/empleados')
@@ -141,7 +141,7 @@ export default function EmpleadoForm() {
 
   const updateMutation = useMutation({
     mutationFn: (data: Omit<EmpleadoFormValues, 'puestoId' | 'departamentoId' | 'salarioDiario'> & { puestoId?: number; departamentoId?: number; salarioDiario: number }) =>
-      api.put(`/api/rrhh/empleados/${id}`, data).then((r) => r.data),
+      api.put<ApiResponse<Empleado>>(`/rrhh/empleados/${id}`, data).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['empleados'] })
       queryClient.invalidateQueries({ queryKey: ['empleado', id] })

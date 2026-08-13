@@ -3,6 +3,12 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface Lote {
   id: number
   nombre: string
@@ -47,13 +53,13 @@ export default function AnimalForm() {
 
   const { data: animalRes, isLoading: loadingAnimal } = useQuery({
     queryKey: ['animal', id],
-    queryFn: () => api.get<Animal>(`/informatica/animales/${id}`),
+    queryFn: () => api.get<ApiResponse<Animal>>(`/informatica/animales/${id}`),
     enabled: isEdit,
   })
 
   const { data: lotesRes } = useQuery({
     queryKey: ['lotes'],
-    queryFn: () => api.get<Lote[]>('/informatica/lotes'),
+    queryFn: () => api.get<ApiResponse<Lote[]>>('/informatica/lotes'),
   })
 
   const lotes = lotesRes?.data ?? []
@@ -74,7 +80,7 @@ export default function AnimalForm() {
 
   const createMutation = useMutation({
     mutationFn: (data: AnimalFormData) =>
-      api.post('/informatica/animales', {
+      api.post<ApiResponse<Animal>>('/informatica/animales', {
         arete: data.arete,
         nombre: data.nombre || undefined,
         sexo: data.sexo,
@@ -94,7 +100,7 @@ export default function AnimalForm() {
 
   const updateMutation = useMutation({
     mutationFn: (data: AnimalFormData) =>
-      api.put(`/informatica/animales/${id}`, {
+      api.put<ApiResponse<Animal>>(`/informatica/animales/${id}`, {
         arete: data.arete,
         nombre: data.nombre || undefined,
         sexo: data.sexo,

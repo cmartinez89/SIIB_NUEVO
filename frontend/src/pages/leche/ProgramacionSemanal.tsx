@@ -33,7 +33,7 @@ export default function ProgramacionSemanal() {
 
   const { data, isLoading } = useQuery<ProgramacionResponse>({
     queryKey: ['leche-programacion', weekStart],
-    queryFn: () => api(`/leche/programacion?semana=${weekStart}`),
+    queryFn: () => api.get<ProgramacionResponse>(`/leche/programacion?semana=${weekStart}`),
   })
 
   const rows = data?.data ?? []

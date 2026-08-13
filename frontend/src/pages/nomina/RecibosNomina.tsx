@@ -1,9 +1,15 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
 import { api } from '../../lib/api'
+
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
 
 interface Empleado {
   id: number
@@ -222,12 +228,12 @@ export default function RecibosNomina() {
 
   const { data: nominas = [], isLoading: loadingNominas } = useQuery<NominaGrupo[]>({
     queryKey: ['nominas-pagadas'],
-    queryFn: () => api.get('/api/nomina?status=PAGADA').then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<NominaGrupo[]>>('/nomina?status=PAGADA').then((r) => r.data),
   })
 
   const { data: nominaDetalle, isLoading: loadingDetalle } = useQuery<NominaGrupo>({
     queryKey: ['nomina-detalle', selectedNominaId],
-    queryFn: () => api.get(`/api/nomina/${selectedNominaId}`).then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<NominaGrupo>>(`/nomina/${selectedNominaId}`).then((r) => r.data),
     enabled: !!selectedNominaId,
   })
 

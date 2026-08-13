@@ -3,6 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface ConceptoRow {
   id?: number
   concepto: string
@@ -65,7 +71,7 @@ export default function FacturaForrajeForm() {
 
   const { data: facturaResponse, isLoading: loadingFactura } = useQuery({
     queryKey: ['factura-forraje', id],
-    queryFn: () => api.get<FacturaResponse>(`/alimentacion/facturas-forraje/${id}`),
+    queryFn: () => api.get<ApiResponse<FacturaResponse>>(`/alimentacion/facturas-forraje/${id}`),
     enabled: isEdit,
   })
 
@@ -93,9 +99,9 @@ export default function FacturaForrajeForm() {
   const mutation = useMutation({
     mutationFn: (payload: FacturaFormData) => {
       if (isEdit) {
-        return api.put<FacturaResponse>(`/alimentacion/facturas-forraje/${id}`, payload)
+        return api.put<ApiResponse<FacturaResponse>>(`/alimentacion/facturas-forraje/${id}`, payload)
       }
-      return api.post<FacturaResponse>('/alimentacion/facturas-forraje', payload)
+      return api.post<ApiResponse<FacturaResponse>>('/alimentacion/facturas-forraje', payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['facturas-forraje'] })

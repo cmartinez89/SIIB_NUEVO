@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
-import Table, { TableColumn } from '../../components/ui/Table'
+import Table, { Column } from '../../components/ui/Table'
 import { api } from '../../lib/api'
 
 interface Puesto {
@@ -132,7 +132,7 @@ export default function EmpleadoDetalle() {
     error,
   } = useQuery<ApiResponse<Empleado>>({
     queryKey: ['empleado', id],
-    queryFn: () => api.get(`/api/rrhh/empleados/${id}`).then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Empleado>>(`/rrhh/empleados/${id}`),
     enabled: Boolean(id),
   })
 
@@ -145,60 +145,60 @@ export default function EmpleadoDetalle() {
   ]
 
   // Nomina table columns
-  const nominaColumns: TableColumn<NominaDetalle>[] = [
+  const nominaColumns: Column<NominaDetalle>[] = [
     { key: 'periodo', header: 'Período' },
     {
       key: 'percepciones',
       header: 'Percepciones',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="text-green-700 font-medium">{formatMXN(row.percepciones)}</span>
       ),
     },
     {
       key: 'retenciones',
       header: 'Retenciones',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="text-red-600 font-medium">{formatMXN(row.retenciones)}</span>
       ),
     },
     {
       key: 'neto',
       header: 'Neto',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="text-blue-700 font-semibold">{formatMXN(row.neto)}</span>
       ),
     },
     {
       key: 'fechaPago',
       header: 'Fecha Pago',
-      render: (_v, row) => formatDate(row.fechaPago),
+      render: (row) => formatDate(row.fechaPago),
     },
   ]
 
   // Vacaciones table columns
-  const vacacionColumns: TableColumn<VacacionRecord>[] = [
+  const vacacionColumns: Column<VacacionRecord>[] = [
     { key: 'periodo', header: 'Período' },
     {
       key: 'diasSolicitados',
       header: 'Días Solicitados',
-      render: (_v, row) => (
+      render: (row) => (
         <span className="font-medium text-gray-700">{row.diasSolicitados} días</span>
       ),
     },
     {
       key: 'fechaInicio',
       header: 'Fecha Inicio',
-      render: (_v, row) => formatDate(row.fechaInicio),
+      render: (row) => formatDate(row.fechaInicio),
     },
     {
       key: 'fechaFin',
       header: 'Fecha Fin',
-      render: (_v, row) => formatDate(row.fechaFin),
+      render: (row) => formatDate(row.fechaFin),
     },
     {
       key: 'estatus',
       header: 'Estatus',
-      render: (_v, row) => {
+      render: (row) => {
         const map: Record<string, 'success' | 'warning' | 'danger'> = {
           Aprobado: 'success',
           Pendiente: 'warning',

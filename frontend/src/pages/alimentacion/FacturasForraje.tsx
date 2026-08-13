@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
+
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
 
 interface FacturaForraje {
   id: number
@@ -43,7 +49,7 @@ export default function FacturasForraje() {
     error,
   } = useQuery({
     queryKey: ['facturas-forraje'],
-    queryFn: () => api.get<FacturaForraje[]>('/alimentacion/facturas-forraje'),
+    queryFn: () => api.get<ApiResponse<FacturaForraje[]>>('/alimentacion/facturas-forraje'),
   })
 
   const facturas = facturasResponse?.data ?? []

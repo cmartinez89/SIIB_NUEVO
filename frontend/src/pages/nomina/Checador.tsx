@@ -1,23 +1,7 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Button from '../../components/ui/Button'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
-
-interface Empleado {
-  id: number
-  noEmpleado: string
-  nombre: string
-  apellidos: string
-  rfc: string
-  curp: string
-  nss: string
-  salarioDiario: number
-  puestoId?: number
-  departamentoId?: number
-  activo: boolean
-  puesto?: { id: number; nombre: string }
-  departamento?: { id: number; nombre: string }
-}
 
 type AttendanceStatus = 'PRESENTE' | 'RETARDO' | 'FALTA'
 

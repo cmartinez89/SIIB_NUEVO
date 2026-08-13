@@ -2,10 +2,15 @@ import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Button from '../../components/ui/Button'
-import Input from '../../components/ui/Input'
 import Badge from '../../components/ui/Badge'
 import Card from '../../components/ui/Card'
 import { api } from '../../lib/api'
+
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
 
 interface Empleado {
   id: number
@@ -96,19 +101,19 @@ export default function PrenominaDetalle() {
 
   const { data: nomina, isLoading, isError } = useQuery<NominaGrupo>({
     queryKey: ['nomina', id],
-    queryFn: () => api.get(`/api/nomina/${id}`).then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<NominaGrupo>>(`/nomina/${id}`).then((r) => r.data),
     enabled: !!id,
   })
 
   const { data: empleados = [] } = useQuery<Empleado[]>({
     queryKey: ['empleados-all'],
-    queryFn: () => api.get('/api/rrhh/empleados').then((r) => r.data),
+    queryFn: () => api.get<ApiResponse<Empleado[]>>('/rrhh/empleados').then((r) => r.data),
     enabled: showAddModal,
   })
 
   const updateDetalle = useMutation({
     mutationFn: ({ detalleId, data }: { detalleId: number; data: Partial<NominaDetalle> }) =>
-      api.put(`/api/nomina/${id}/detalles/${detalleId}`, data).then((r) => r.data),
+      api.put<ApiResponse<NominaDetalle>>(`/nomina/${id}/detalles/${detalleId}`, data).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nomina', id] })
       setEditingId(null)
@@ -117,7 +122,7 @@ export default function PrenominaDetalle() {
 
   const addDetalle = useMutation({
     mutationFn: (data: { empleadoId: number; totalPercepciones: number; totalRetenciones: number; pago: number }) =>
-      api.post(`/api/nomina/${id}/detalles`, data).then((r) => r.data),
+      api.post<ApiResponse<NominaDetalle>>(`/nomina/${id}/detalles`, data).then((r) => r.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nomina', id] })
       setShowAddModal(false)

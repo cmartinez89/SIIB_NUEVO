@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { api } from '../../lib/api'
@@ -530,7 +530,7 @@ export default function NominaIndex() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             onClick={() => navigate(`/nomina/${nomina.id}`)}
                           >

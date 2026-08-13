@@ -21,7 +21,7 @@ export default function SolicitudPagoForm() {
 
   const mutation = useMutation({
     mutationFn: (body: FormData) =>
-      api('/contabilidad/solicitudes', { method: 'POST', body: { ...body, detalles, importe: total } }),
+      api.post('/contabilidad/solicitudes', { ...body, detalles, importe: total }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['solicitudes-pago'] }); navigate('/contabilidad') },
   })
 

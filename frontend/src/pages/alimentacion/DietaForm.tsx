@@ -3,6 +3,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../lib/api'
 
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
+
 interface IngredienteRow {
   id?: number
   ingrediente: string
@@ -67,7 +73,7 @@ export default function DietaForm() {
 
   const { data: dietaResponse, isLoading: loadingDieta } = useQuery({
     queryKey: ['dieta', id],
-    queryFn: () => api.get<DietaResponse>(`/alimentacion/dietas/${id}`),
+    queryFn: () => api.get<ApiResponse<DietaResponse>>(`/alimentacion/dietas/${id}`),
     enabled: isEdit,
   })
 
@@ -94,9 +100,9 @@ export default function DietaForm() {
   const mutation = useMutation({
     mutationFn: (payload: DietaFormData) => {
       if (isEdit) {
-        return api.put<DietaResponse>(`/alimentacion/dietas/${id}`, payload)
+        return api.put<ApiResponse<DietaResponse>>(`/alimentacion/dietas/${id}`, payload)
       }
-      return api.post<DietaResponse>('/alimentacion/dietas', payload)
+      return api.post<ApiResponse<DietaResponse>>('/alimentacion/dietas', payload)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dietas'] })

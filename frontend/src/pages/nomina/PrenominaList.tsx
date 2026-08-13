@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '../../lib/api'
 import Button from '../../components/ui/Button'
-import Badge from '../../components/ui/Badge'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -175,7 +174,7 @@ export default function PrenominaList() {
     totalPercepciones: prenominas.reduce((acc, n) => acc + (n.totalPercepciones ?? 0), 0),
     totalRetenciones: prenominas.reduce((acc, n) => acc + (n.totalRetenciones ?? 0), 0),
     netoTotal: prenominas.reduce(
-      (acc, n) => acc + (n.netoAPagar ?? n.totalPago - (n.totalRetenciones ?? 0) ?? 0),
+      (acc, n) => acc + (n.netoAPagar ?? n.totalPago - (n.totalRetenciones ?? 0)),
       0
     ),
   }

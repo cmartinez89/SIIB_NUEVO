@@ -39,7 +39,7 @@ export default function EnviosLeche() {
 
   const { data, isLoading } = useQuery<EnviosResponse>({
     queryKey: ['envios-leche', fechaDesde, fechaHasta, cliente],
-    queryFn: () => api(`/leche/envios?${params}`),
+    queryFn: () => api.get<EnviosResponse>(`/leche/envios?${params}`),
   })
 
   const envios = data?.data ?? []

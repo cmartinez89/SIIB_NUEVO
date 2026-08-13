@@ -100,14 +100,6 @@ const formatCurrency = (value: number): string =>
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function Spinner() {
-  return (
-    <div className="flex items-center justify-center py-16">
-      <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-}
-
 function TableSkeleton() {
   return (
     <div className="space-y-2 p-4">

@@ -39,7 +39,7 @@ export default function SolicitudesPago() {
 
   const { data, isLoading } = useQuery<SolicitudesResponse>({
     queryKey: ['solicitudes-pago', statusId, search],
-    queryFn: () => api(`/contabilidad/solicitudes?${params}`),
+    queryFn: () => api.get<SolicitudesResponse>(`/contabilidad/solicitudes?${params}`),
   })
 
   const solicitudes = data?.data ?? []

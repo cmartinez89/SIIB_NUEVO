@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../lib/api'
+
+interface ApiResponse<T> {
+  success: boolean
+  data: T
+  error?: string
+}
 
 interface DietaDetalle {
   id: number
@@ -71,12 +77,12 @@ export default function DietasList() {
     error: dietasErr,
   } = useQuery({
     queryKey: ['dietas'],
-    queryFn: () => api.get<Dieta[]>('/alimentacion/dietas'),
+    queryFn: () => api.get<ApiResponse<Dieta[]>>('/alimentacion/dietas'),
   })
 
   const { data: resumenResponse } = useQuery({
     queryKey: ['dietas-resumen'],
-    queryFn: () => api.get<ResumenData>('/alimentacion/resumen'),
+    queryFn: () => api.get<ApiResponse<ResumenData>>('/alimentacion/resumen'),
   })
 
   const dietas = dietasResponse?.data ?? []
