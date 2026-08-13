@@ -249,6 +249,10 @@ npx prisma migrate reset   # Borra todo y re-crea desde cero
 
 **Balance honesto de todo lo anterior:** las 5 fases tienen trabajo real y comiteado, pero dos huecos quedaron documentados en vez de fabricados — llevar Compras/Nómina a paridad financiera real (firmas, presupuesto, fórmulas de nómina) y el Tracker (requiere una base Firebird física que no existe en este entorno). Ninguno de los dos se resolvió con código inventado.
 
+**Verificación de extremo a extremo — 2026-08-12/13:** se instaló PostgreSQL 15 local (sin Docker, no disponible en el entorno de esta sesión), se corrieron las migraciones reales (`prisma/migrations/` ya está en el repo) y el seed, y se probó en vivo: login + menú dinámico por rol, creación de requisición → cotizar → token → PDF del Portal descargado real, Casetas, Tareas, Báscula SAB, Evaluaciones, Reportes (JSON y Excel), y los 401 esperados sin token. De ahí salieron dos hallazgos reales que ya están corregidos:
+- Faltaba `"prisma": {"seed": "..."}` en `backend/package.json` — `npx prisma db seed` (el paso documentado arriba) nunca había funcionado.
+- El build de producción del frontend (`npm run build`) nunca había compilado — tenía 146 errores de TypeScript reales repartidos en Nómina/RRHH/Alimentación/Informática/Leche/Contabilidad, varios de ellos bugs genuinos (rutas con `/api` duplicado que resolvían en 404, respuestas de API desenvueltas dos veces, y cuatro páginas que llamaban `api(...)` como función en vez de `api.get(...)`). Los 146 quedaron corregidos y verificados contra el backend real.
+
 ---
 
 ## Comparación con Sistema Original
